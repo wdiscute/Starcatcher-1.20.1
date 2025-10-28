@@ -67,11 +67,13 @@ public class FishingTreasure extends Item
 //        }
 
 
+        //todo fix treasure loot_table stuff idk how to get it in 1.20
         //if no curated loot left, use default pool
-        ResourceKey<LootTable> lootTable = ResourceKey.create(Registries.LOOT_TABLE, this.lootTable);
-        LootParams params = new LootParams.Builder((ServerLevel) level).create(LootContextParamSets.EMPTY);
-        ObjectArrayList<ItemStack> arrayOfItemStacks = level.getServer().registryAccess().getLootTable(lootTable).getRandomItems(params);
-        player.setItemInHand(usedHand, arrayOfItemStacks.get(level.random.nextIntBetweenInclusive(0, arrayOfItemStacks.size() - 1)));
+//        ResourceKey<LootTable> lootTable = ResourceKey.create(Registries.LOOT_TABLE, this.lootTable);
+//        LootParams params = new LootParams.Builder((ServerLevel) level).create(LootContextParamSets.EMPTY);
+//        ObjectArrayList<ItemStack> arrayOfItemStacks = level.getServer().registryAccess().getLootTable(lootTable).getRandomItems(params);
+//        player.setItemInHand(usedHand, arrayOfItemStacks.get(level.random.nextIntBetweenInclusive(0, arrayOfItemStacks.size() - 1)));
+
         return InteractionResultHolder.success(player.getItemInHand(usedHand));
     }
 }

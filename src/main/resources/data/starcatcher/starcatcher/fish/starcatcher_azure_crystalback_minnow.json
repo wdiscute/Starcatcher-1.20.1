@@ -1,0 +1,35 @@
+{
+  "above_y": 50,
+  "bait_restrictions": {
+    "correct_bait_chance_added": 15,
+    "correct_baits": [
+      "starcatcher:legendary_bait"
+    ]
+  },
+  "base_chance": 1,
+  "below_y": 100,
+  "daytime": "midnight",
+  "difficulty": {
+    "change_rotation_every_hit": false,
+    "decay": 10,
+    "penalty": 0,
+    "reward": 18,
+    "reward_thin": 30,
+    "speed": 15,
+    "treasure": {
+      "has_treasure": true,
+      "hit_reward": 15,
+      "loot": "starcatcher:treasure"
+    }
+  },
+  "fish": "starcatcher:azure_crystalback_minnow",
+  "rarity": "legendary",
+  "world_restrictions": {
+    "biomes_tags": [
+      "starcatcher:is_cold_river"
+    ],
+    "dimensions": [
+      "minecraft:overworld"
+    ]
+  }
+}

@@ -1,6 +1,7 @@
 package com.wdiscute.starcatcher;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -12,19 +13,25 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RenderGuiEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
 import java.util.List;
 
+@OnlyIn(Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = Starcatcher.MOD_ID, value = Dist.CLIENT)
 public class Tooltips
 {
     public static float hue;
 
     @OnlyIn(Dist.CLIENT)
+    @SubscribeEvent
     public static void renderFrame(RenderGuiEvent.Post event)
     {
         Tooltips.hue += 0.001f;
     }
 
+    @SubscribeEvent
     public static void modifyItemTooltip(ItemTooltipEvent event)
     {
         List<Component> tooltipComponents = event.getToolTip();
@@ -44,7 +51,7 @@ public class Tooltips
         if (I18n.exists(baseTooltip + ".0"))
         {
             //todo this probably doesnt work on screens
-            if (Minecraft.getInstance().player.isShiftKeyDown())
+            if (Screen.hasShiftDown())
             {
                 tooltipComponents.add(Component.translatable("tooltip.libtooltips.generic.shift_down"));
                 tooltipComponents.add(Component.translatable("tooltip.libtooltips.generic.empty"));

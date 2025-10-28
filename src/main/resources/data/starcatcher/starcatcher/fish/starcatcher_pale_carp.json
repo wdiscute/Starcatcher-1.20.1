@@ -1,0 +1,13 @@
+{
+  "above_y": 50,
+  "daytime": "day",
+  "fish": "starcatcher:pale_carp",
+  "world_restrictions": {
+    "biomes_tags": [
+      "starcatcher:is_dark_forest"
+    ],
+    "dimensions": [
+      "minecraft:overworld"
+    ]
+  }
+}

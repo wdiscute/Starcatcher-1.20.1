@@ -3,8 +3,6 @@ package com.wdiscute.starcatcher.secretnotes;
 import com.mojang.serialization.Codec;
 import com.wdiscute.starcatcher.networkandcodecs.ModDataComponents;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -14,22 +12,18 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.network.codec.NeoForgeStreamCodecs;
-import org.jetbrains.annotations.NotNull;
 
 public class SecretNote extends Item
 {
     public SecretNote()
     {
-        super(new Properties().stacksTo(1).component(ModDataComponents.SECRET_NOTE, Note.SAMPLE_NOTE));
+        super(new Properties().stacksTo(1));
     }
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand)
     {
-        if(level.isClientSide) openScreen(player.getItemInHand(usedHand).get(ModDataComponents.SECRET_NOTE));
+        if(level.isClientSide) openScreen(ModDataComponents.getSecretNote(player.getItemInHand(usedHand)));
         return super.use(level, player, usedHand);
     }
 
@@ -50,7 +44,7 @@ public class SecretNote extends Item
         TRUE_BLUE("true_blue");
 
         public static final Codec<Note> CODEC = StringRepresentable.fromEnum(Note::values);
-        public static final StreamCodec<FriendlyByteBuf, Note> STREAM_CODEC = NeoForgeStreamCodecs.enumCodec(Note.class);
+        //public static final StreamCodec<FriendlyByteBuf, Note> STREAM_CODEC = NeoForgeStreamCodecs.enumCodec(Note.class);
         private final String key;
 
         Note(String key)
@@ -58,7 +52,7 @@ public class SecretNote extends Item
             this.key = key;
         }
 
-        public @NotNull String getSerializedName()
+        public String getSerializedName()
         {
             return this.key;
         }

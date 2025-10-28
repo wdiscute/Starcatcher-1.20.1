@@ -15,32 +15,23 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.Registry;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
-import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
-import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DataPackRegistryEvent;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.slf4j.Logger;
-
-import javax.tools.Tool;
-import java.util.List;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(Starcatcher.MOD_ID)
@@ -67,8 +58,11 @@ public class Starcatcher
         Minecraft.getInstance().getToasts().addToast(new FishCaughtToast(fp));
     }
 
-    public Starcatcher(IEventBus eventBus, ModContainer modContainer)
+    public Starcatcher(FMLJavaModLoadingContext context)
     {
+
+        IEventBus eventBus = context.getModEventBus();
+
         ModCreativeModeTabs.register(eventBus);
         ModItems.register(eventBus);
         //ModDataComponents.register(eventBus);
@@ -77,9 +71,6 @@ public class Starcatcher
         ModParticles.register(eventBus);
         ModMenuTypes.register(eventBus);
         //ModDataAttachments.register(eventBus);
-
-        eventBus.addListener(Tooltips::modifyItemTooltip);
-        eventBus.addListener(Tooltips::renderFrame);
 
         //modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }
@@ -105,35 +96,35 @@ public class Starcatcher
             event.put(ModEntities.FISH.get(), FishEntity.createAttributes().build());
         }
 
-        @SubscribeEvent
-        public static void registerPayloads(RegisterPayloadHandlersEvent event)
-        {
-            final PayloadRegistrar registrar = event.registrar("1");
-            registrar.playToClient(
-                    Payloads.FishingPayload.TYPE,
-                    Payloads.FishingPayload.STREAM_CODEC,
-                    PayloadReceiver::receiveFishingClient
-            );
-
-            registrar.playToServer(
-                    Payloads.FishingCompletedPayload.TYPE,
-                    Payloads.FishingCompletedPayload.STREAM_CODEC,
-                    PayloadReceiver::receiveFishingCompletedServer
-            );
-
-            registrar.playToClient(
-                    Payloads.FishCaughtPayload.TYPE,
-                    Payloads.FishCaughtPayload.STREAM_CODEC,
-                    PayloadReceiver::receiveFishCaught
-            );
-
-            registrar.playToServer(
-                    Payloads.FPsSeen.TYPE,
-                    Payloads.FPsSeen.STREAM_CODEC,
-                    PayloadReceiver::receiveFPsSeen
-            );
-
-        }
+//        @SubscribeEvent
+//        public static void registerPayloads(RegisterPayloadHandlersEvent event)
+//        {
+//            final PayloadRegistrar registrar = event.registrar("1");
+//            registrar.playToClient(
+//                    Payloads.FishingPayload.TYPE,
+//                    Payloads.FishingPayload.STREAM_CODEC,
+//                    PayloadReceiver::receiveFishingClient
+//            );
+//
+//            registrar.playToServer(
+//                    Payloads.FishingCompletedPayload.TYPE,
+//                    Payloads.FishingCompletedPayload.STREAM_CODEC,
+//                    PayloadReceiver::receiveFishingCompletedServer
+//            );
+//
+//            registrar.playToClient(
+//                    Payloads.FishCaughtPayload.TYPE,
+//                    Payloads.FishCaughtPayload.STREAM_CODEC,
+//                    PayloadReceiver::receiveFishCaught
+//            );
+//
+//            registrar.playToServer(
+//                    Payloads.FPsSeen.TYPE,
+//                    Payloads.FPsSeen.STREAM_CODEC,
+//                    PayloadReceiver::receiveFPsSeen
+//            );
+//
+//        }
 
     }
 

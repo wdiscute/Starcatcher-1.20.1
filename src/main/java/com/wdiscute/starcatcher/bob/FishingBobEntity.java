@@ -109,7 +109,7 @@ public class FishingBobEntity extends Projectile
         }
 
         if (!level.isClientSide)
-            ModDataAttachments.setFishingUUID(this.uuid.toString());
+            ModDataAttachments.setFishingUUID(player, this.uuid.toString());
             //player.setData(ModDataAttachments.FISHING.get(), this.uuid.toString());
 
         currentState = FishHookState.FLYING;
@@ -171,7 +171,8 @@ public class FishingBobEntity extends Projectile
             {
 
                 ItemStack is = new ItemStack(BuiltInRegistries.ITEM.get(tp.fp().fish().unwrapKey().get()));
-                is.set(ModDataComponents.TROPHY, tp);
+                ModDataComponents.setTrophyProperties(is, tp);
+                //is.set(ModDataComponents.TROPHY, tp);
                 if (!tp.customName().isEmpty())
                     is.setHoverName(Component.literal(tp.customName()));
                     //1.20 fix
@@ -191,9 +192,9 @@ public class FishingBobEntity extends Projectile
 
                 trophiesCaught.add(tp);
 
-                ModDataAttachments.setTrophiesCaught(trophiesCaught);
+                ModDataAttachments.setTrophiesCaught(player, trophiesCaught);
                 //player.setData(ModDataAttachments.TROPHIES_CAUGHT, trophiesCaught);
-                ModDataAttachments.setFishingUUID("");
+                ModDataAttachments.setFishingUUID(player, "");
                 //player.setData(ModDataAttachments.FISHING, "");
                 kill();
                 return;
@@ -214,7 +215,7 @@ public class FishingBobEntity extends Projectile
 
         if (available.isEmpty())
         {
-            ModDataAttachments.setFishingUUID("");
+            ModDataAttachments.setFishingUUID(player, "");
             //player.setData(ModDataAttachments.FISHING, "");
             this.discard();
         }
@@ -261,17 +262,18 @@ public class FishingBobEntity extends Projectile
 
             level().addFreshEntity(itemFished);
 
-            ModDataAttachments.setFishingUUID("");
+            ModDataAttachments.setFishingUUID(player, "");
             //player.setData(ModDataAttachments.FISHING, "");
 
             kill();
         }
         else
         {
-            PacketDistributor.sendToPlayer(
-                    ((ServerPlayer) player),
-                    new Payloads.FishingPayload(fpToFish, rod)
-            );
+            //todo send payload to start minigame
+//            PacketDistributor.sendToPlayer(
+//                    ((ServerPlayer) player),
+//                    new Payloads.FishingPayload(fpToFish, rod)
+//            );
         }
 
 
@@ -310,7 +312,7 @@ public class FishingBobEntity extends Projectile
         }
         else
         {
-            ModDataAttachments.setFishingUUID("");
+            ModDataAttachments.setFishingUUID(player, "");
             //player.setData(ModDataAttachments.FISHING.get(), "");
             this.discard();
             return true;
@@ -329,7 +331,7 @@ public class FishingBobEntity extends Projectile
         super.lavaHurt();
         if (!hook.is(StarcatcherTags.HOOKS_SURVIVE_FIRE) && !level().isClientSide)
         {
-            ModDataAttachments.setFishingUUID("");
+            ModDataAttachments.setFishingUUID(player, "");
             //player.setData(ModDataAttachments.FISHING, "");
             kill();
         }
@@ -358,7 +360,7 @@ public class FishingBobEntity extends Projectile
         Player player = ((Player) this.getOwner());
         if (player == null || this.shouldStopFishing(player))
         {
-            ModDataAttachments.setFishingUUID("");
+            ModDataAttachments.setFishingUUID(player, "");
             //player.setData(ModDataAttachments.FISHING.get(), "");
             this.discard();
         }
@@ -395,7 +397,7 @@ public class FishingBobEntity extends Projectile
 
             if (timeBiting > 80)
             {
-                ModDataAttachments.setFishingUUID("");
+                ModDataAttachments.setFishingUUID(player, "");
                 //player.setData(ModDataAttachments.FISHING, "");
                 kill();
             }

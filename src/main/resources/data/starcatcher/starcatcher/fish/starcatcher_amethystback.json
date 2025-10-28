@@ -1,0 +1,24 @@
+{
+  "above_y": -40,
+  "below_y": -20,
+  "difficulty": {
+    "change_rotation_every_hit": false,
+    "decay": 2,
+    "has_second_marker": false,
+    "penalty": 15,
+    "reward": 5,
+    "speed": 15,
+    "treasure": {
+      "has_treasure": true,
+      "hit_reward": 15,
+      "loot": "starcatcher:treasure"
+    }
+  },
+  "fish": "starcatcher:amethystback",
+  "rarity": "epic",
+  "world_restrictions": {
+    "dimensions": [
+      "minecraft:overworld"
+    ]
+  }
+}

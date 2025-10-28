@@ -124,7 +124,7 @@ public class FishingGuideScreen extends Screen
     List<FishCaughtCounter> fishCaughtCounterList = new ArrayList<>();
 
     //TrophyProperties.RarityProgress all = new TrophyProperties.RarityProgress(0, Minecraft.getInstance().player.getData(ModDataAttachments.FISHES_CAUGHT).size() - 1); //-1 to remove the default
-    TrophyProperties.RarityProgress all = new TrophyProperties.RarityProgress(0, ModDataAttachments.getFishesCaught(player).size() - 1); //-1 to remove the default
+    TrophyProperties.RarityProgress all = new TrophyProperties.RarityProgress(0, ModDataAttachments.getFishCaught(player).size() - 1); //-1 to remove the default
     TrophyProperties.RarityProgress common = new TrophyProperties.RarityProgress(0, -1);
     TrophyProperties.RarityProgress uncommon = TrophyProperties.RarityProgress.DEFAULT;
     TrophyProperties.RarityProgress rare = TrophyProperties.RarityProgress.DEFAULT;
@@ -167,7 +167,7 @@ public class FishingGuideScreen extends Screen
 
         //-1 on the common to account for the default "fish" unfortunately, theres probably a way to fix this
         //all = new TrophyProperties.RarityProgress(0, player.getData(ModDataAttachments.FISHES_CAUGHT).size() - 1); //-1 to remove the default
-        all = new TrophyProperties.RarityProgress(0, ModDataAttachments.getFishesCaught(player).size() - 1); //-1 to remove the default
+        all = new TrophyProperties.RarityProgress(0, ModDataAttachments.getFishCaught(player).size() - 1); //-1 to remove the default
         common = new TrophyProperties.RarityProgress(0, -1);
         uncommon = TrophyProperties.RarityProgress.DEFAULT;
         rare = TrophyProperties.RarityProgress.DEFAULT;
@@ -1544,7 +1544,8 @@ public class FishingGuideScreen extends Screen
     public void onClose()
     {
         Minecraft.getInstance().options.advancedItemTooltips = advancedTooltips;
-        PacketDistributor.sendToServer(new Payloads.FPsSeen(fpsSeen));
+        //todo send packet of fishes seen to remove notification
+        //PacketDistributor.sendToServer(new Payloads.FPsSeen(fpsSeen));
         super.onClose();
     }
 

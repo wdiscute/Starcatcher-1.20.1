@@ -1,0 +1,10 @@
+{
+  "above_y": 0,
+  "below_y": 50,
+  "fish": "starcatcher:whiteveil",
+  "world_restrictions": {
+    "dimensions": [
+      "minecraft:overworld"
+    ]
+  }
+}

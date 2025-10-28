@@ -4,11 +4,11 @@ import net.minecraft.server.level.ServerPlayer;
 
 public class PacketDistributor
 {
-    public static void sendToServer(Payloads.FishingCompletedPayload fishingCompletedPayload)
+    public static void sendToServer()
     {
     }
 
-    public static void sendToPlayer(ServerPlayer sp, Payloads.FishCaughtPayload fishCaughtPayload)
+    public static void sendToPlayer()
     {
     }
 }

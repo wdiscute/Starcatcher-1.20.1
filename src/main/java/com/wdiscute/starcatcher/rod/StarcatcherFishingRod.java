@@ -3,8 +3,6 @@ package com.wdiscute.starcatcher.rod;
 import com.wdiscute.starcatcher.ModItems;
 import com.wdiscute.starcatcher.bob.FishingBobEntity;
 import com.wdiscute.starcatcher.networkandcodecs.ModDataAttachments;
-import com.wdiscute.starcatcher.networkandcodecs.ModDataComponents;
-import com.wdiscute.starcatcher.networkandcodecs.SingleStackContainer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -21,7 +19,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -54,7 +51,8 @@ public class StarcatcherFishingRod extends Item implements MenuProvider
         if (level.isClientSide) return InteractionResultHolder.success(player.getItemInHand(hand));
 
 
-        if (player.getData(ModDataAttachments.FISHING.get()).isEmpty())
+        if (ModDataAttachments.getFishingUUID(player).isEmpty())
+        //if (player.getData(ModDataAttachments.FISHING.get()).isEmpty())
         {
             level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.FISHING_BOBBER_THROW, SoundSource.NEUTRAL, 0.5F, 0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F));
 
@@ -65,7 +63,9 @@ public class StarcatcherFishingRod extends Item implements MenuProvider
                 FishingBobEntity entity = new FishingBobEntity(level, player, player.getItemInHand(hand));
                 level.addFreshEntity(entity);
 
-                player.setData(ModDataAttachments.FISHING.get(), entity.getStringUUID());
+                ModDataAttachments.setFishingUUID(player, entity.getStringUUID());
+                //player.setData(ModDataAttachments.FISHING.get(), entity.getStringUUID());
+                //removed and used variable in entity instead
                 //entity.setData(ModDataAttachments.BOBBER.get(), player.getItemInHand(hand).get(ModDataComponents.BOBBER));
             }
         }
@@ -76,12 +76,15 @@ public class StarcatcherFishingRod extends Item implements MenuProvider
 
             for (Entity entity : entities)
             {
-                if (entity.getUUID().toString().equals(player.getData(ModDataAttachments.FISHING.get())))
+
+                if (entity.getUUID().toString().equals(ModDataAttachments.getFishingUUID(player)))
+                //if (entity.getUUID().toString().equals(player.getData(ModDataAttachments.FISHING.get())))
                 {
                     if (entity instanceof FishingBobEntity fbe && !fbe.checkBiting())
                     {
                         fbe.kill();
-                        player.setData(ModDataAttachments.FISHING.get(), "");
+                        ModDataAttachments.setFishingUUID(player, "");
+                        //player.setData(ModDataAttachments.FISHING.get(), "");
                     }
                 }
             }
@@ -112,7 +115,7 @@ public class StarcatcherFishingRod extends Item implements MenuProvider
     }
 
     @Override
-    public @Nullable AbstractContainerMenu createMenu(int i, Inventory inventory, Player player)
+    public AbstractContainerMenu createMenu(int i, Inventory inventory, Player player)
     {
         if (player.getMainHandItem().is(ModItems.ROD.get()))
             return new FishingRodMenu(i, inventory, player.getMainHandItem());

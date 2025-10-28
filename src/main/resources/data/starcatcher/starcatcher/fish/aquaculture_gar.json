@@ -1,0 +1,19 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "aquaculture"
+    }
+  ],
+  "above_y": 100,
+  "fish": "aquaculture:gar",
+  "world_restrictions": {
+    "biomes_blacklist_tags": [
+      "starcatcher:is_ocean",
+      "starcatcher:is_river"
+    ],
+    "dimensions": [
+      "minecraft:overworld"
+    ]
+  }
+}

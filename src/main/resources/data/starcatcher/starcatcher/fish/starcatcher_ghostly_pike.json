@@ -1,0 +1,11 @@
+{
+  "base_chance": 2,
+  "below_y": 0,
+  "fish": "starcatcher:ghostly_pike",
+  "rarity": "uncommon",
+  "world_restrictions": {
+    "dimensions": [
+      "minecraft:overworld"
+    ]
+  }
+}

@@ -1,8 +1,8 @@
 package com.wdiscute.starcatcher.secretnotes;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import com.wdiscute.libtooltips.Tooltips;
 import com.wdiscute.starcatcher.Starcatcher;
+import com.wdiscute.starcatcher.Tooltips;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;

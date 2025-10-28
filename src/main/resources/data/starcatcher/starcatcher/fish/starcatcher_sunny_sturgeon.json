@@ -1,0 +1,31 @@
+{
+  "above_y": 100,
+  "base_chance": 2,
+  "daytime": "day",
+  "difficulty": {
+    "decay": 2,
+    "has_first_marker": false,
+    "has_first_thin_marker": true,
+    "has_second_marker": false,
+    "has_second_thin_marker": true,
+    "penalty": 25,
+    "reward": 15,
+    "reward_thin": 20,
+    "treasure": {
+      "has_treasure": true,
+      "hit_reward": 15,
+      "loot": "starcatcher:treasure"
+    }
+  },
+  "fish": "starcatcher:sunny_sturgeon",
+  "rarity": "rare",
+  "world_restrictions": {
+    "biomes_blacklist_tags": [
+      "starcatcher:is_ocean",
+      "starcatcher:is_river"
+    ],
+    "dimensions": [
+      "minecraft:overworld"
+    ]
+  }
+}

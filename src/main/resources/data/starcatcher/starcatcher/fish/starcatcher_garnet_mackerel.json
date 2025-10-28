@@ -1,0 +1,24 @@
+{
+  "below_y": 0,
+  "difficulty": {
+    "decay": 2,
+    "has_first_thin_marker": true,
+    "has_second_marker": false,
+    "penalty": 25,
+    "reward": 15,
+    "reward_thin": 35,
+    "speed": 12,
+    "treasure": {
+      "has_treasure": true,
+      "hit_reward": 15,
+      "loot": "starcatcher:treasure"
+    }
+  },
+  "fish": "starcatcher:garnet_mackerel",
+  "rarity": "uncommon",
+  "world_restrictions": {
+    "dimensions": [
+      "minecraft:overworld"
+    ]
+  }
+}

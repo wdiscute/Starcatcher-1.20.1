@@ -43,31 +43,34 @@ public class FishingTreasure extends Item
                         .map(holders -> holders.stream().toList())
                         .orElse(List.of());
 
-        if (!curatedTreasureInTag.isEmpty())
-        {
-            List<Item> curatedTreasureNotAlreadyCaught = new ArrayList<>();
-            List<ResourceLocation> treasuresCaught = new ArrayList<>(player.getData(ModDataAttachments.TREASURES_CAUGHT));
+        //todo add back curated items
+//        if (!curatedTreasureInTag.isEmpty())
+//        {
+//            List<Item> curatedTreasureNotAlreadyCaught = new ArrayList<>();
+//            List<ResourceLocation> treasuresCaught = new ArrayList<>(player.getData(ModDataAttachments.TREASURES_CAUGHT));
+//            //List<ResourceLocation> treasuresCaught = new ArrayList<>(player.getData(ModDataAttachments.TREASURES_CAUGHT));
+//
+//            //add all curated treasure not already caught to curatedTreasureNotAlreadyCaught var
+//            for (Holder<Item> holder : curatedTreasureInTag)
+//                if (!treasuresCaught.contains(holder.getKey().location()))
+//                    curatedTreasureNotAlreadyCaught.add(holder.value());
+//
+//            //if there is curated loot left, award it to the player
+//            if (!curatedTreasureNotAlreadyCaught.isEmpty())
+//            {
+//                Item item = curatedTreasureNotAlreadyCaught.get(level.random.nextIntBetweenInclusive(0, curatedTreasureNotAlreadyCaught.size() - 1));
+//                treasuresCaught.add(BuiltInRegistries.ITEM.getKey(item));
+//                player.setData(ModDataAttachments.TREASURES_CAUGHT, treasuresCaught);
+//                player.setItemInHand(usedHand, new ItemStack(item));
+//                return InteractionResultHolder.success(player.getItemInHand(usedHand));
+//            }
+//        }
 
-            //add all curated treasure not already caught to curatedTreasureNotAlreadyCaught var
-            for (Holder<Item> holder : curatedTreasureInTag)
-                if (!treasuresCaught.contains(holder.getKey().location()))
-                    curatedTreasureNotAlreadyCaught.add(holder.value());
-
-            //if there is curated loot left, award it to the player
-            if (!curatedTreasureNotAlreadyCaught.isEmpty())
-            {
-                Item item = curatedTreasureNotAlreadyCaught.get(level.random.nextIntBetweenInclusive(0, curatedTreasureNotAlreadyCaught.size() - 1));
-                treasuresCaught.add(BuiltInRegistries.ITEM.getKey(item));
-                player.setData(ModDataAttachments.TREASURES_CAUGHT, treasuresCaught);
-                player.setItemInHand(usedHand, new ItemStack(item));
-                return InteractionResultHolder.success(player.getItemInHand(usedHand));
-            }
-        }
 
         //if no curated loot left, use default pool
         ResourceKey<LootTable> lootTable = ResourceKey.create(Registries.LOOT_TABLE, this.lootTable);
         LootParams params = new LootParams.Builder((ServerLevel) level).create(LootContextParamSets.EMPTY);
-        ObjectArrayList<ItemStack> arrayOfItemStacks = level.getServer().reloadableRegistries().getLootTable(lootTable).getRandomItems(params);
+        ObjectArrayList<ItemStack> arrayOfItemStacks = level.getServer().registryAccess().getLootTable(lootTable).getRandomItems(params);
         player.setItemInHand(usedHand, arrayOfItemStacks.get(level.random.nextIntBetweenInclusive(0, arrayOfItemStacks.size() - 1)));
         return InteractionResultHolder.success(player.getItemInHand(usedHand));
     }

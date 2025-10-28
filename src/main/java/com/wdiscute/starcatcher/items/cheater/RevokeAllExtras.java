@@ -23,14 +23,15 @@ public class RevokeAllExtras extends Item
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand)
     {
         //revoke all extras
-        List<TrophyProperties> list = new ArrayList<>(player.getData(ModDataAttachments.TROPHIES_CAUGHT));
+        List<TrophyProperties> list = new ArrayList<>(ModDataAttachments.getTrophiesCaught(player));
 
-        player.getData(ModDataAttachments.TROPHIES_CAUGHT).forEach(tp ->
+        ModDataAttachments.getTrophiesCaught(player).forEach(tp ->
         {
             if(tp.trophyType() == TrophyProperties.TrophyType.EXTRA) list.remove(tp);
         });
 
-        player.setData(ModDataAttachments.TROPHIES_CAUGHT, list);
+        ModDataAttachments.setTrophiesCaught(player, list);
+        //player.setData(ModDataAttachments.TROPHIES_CAUGHT, list);
         return InteractionResultHolder.success(player.getItemInHand(usedHand));
     }
 

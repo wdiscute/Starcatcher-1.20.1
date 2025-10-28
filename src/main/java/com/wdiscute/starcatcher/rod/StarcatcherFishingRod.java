@@ -32,11 +32,11 @@ public class StarcatcherFishingRod extends Item implements MenuProvider
         super(new Properties()
                 .rarity(Rarity.EPIC)
                 .stacksTo(1)
-                .component(ModDataComponents.BOBBER.get(), SingleStackContainer.EMPTY)
-                .component(ModDataComponents.BAIT.get(), SingleStackContainer.EMPTY)
-                .component(ModDataComponents.HOOK.get(), new SingleStackContainer(new ItemStack(ModItems.HOOK.get())))
         );
     }
+
+
+
 
 
     //comment - kuko010
@@ -62,11 +62,11 @@ public class StarcatcherFishingRod extends Item implements MenuProvider
             {
                 //TODO ADD CUSTOM STAT FOR NUMBER OF FISHES CAUGHT TOTAL ON STAT SCREEN
 
-                Entity entity = new FishingBobEntity(level, player, player.getItemInHand(hand));
+                FishingBobEntity entity = new FishingBobEntity(level, player, player.getItemInHand(hand));
                 level.addFreshEntity(entity);
 
                 player.setData(ModDataAttachments.FISHING.get(), entity.getStringUUID());
-                entity.setData(ModDataAttachments.BOBBER.get(), player.getItemInHand(hand).get(ModDataComponents.BOBBER));
+                //entity.setData(ModDataAttachments.BOBBER.get(), player.getItemInHand(hand).get(ModDataComponents.BOBBER));
             }
         }
         else

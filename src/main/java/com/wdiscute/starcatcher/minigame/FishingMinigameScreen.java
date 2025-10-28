@@ -5,8 +5,10 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.wdiscute.starcatcher.ModItems;
 import com.wdiscute.starcatcher.Starcatcher;
+import com.wdiscute.starcatcher.items.ColorfulBobber;
 import com.wdiscute.starcatcher.networkandcodecs.FishProperties;
 import com.wdiscute.starcatcher.networkandcodecs.ModDataComponents;
+import com.wdiscute.starcatcher.networkandcodecs.PacketDistributor;
 import com.wdiscute.starcatcher.networkandcodecs.Payloads;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -19,9 +21,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.joml.Quaternionf;
 import org.joml.Random;
 import org.joml.Vector2d;
@@ -96,14 +98,14 @@ public class FishingMinigameScreen extends Screen implements GuiEventListener
 
         this.fp = fp;
         this.itemBeingFished = new ItemStack(fp.fish());
-        this.bobber = rod.get(ModDataComponents.BOBBER).stack().copy();
-        this.bait = rod.get(ModDataComponents.BAIT).stack().copy();
-        this.hook = rod.get(ModDataComponents.HOOK).stack().copy();
+        this.bobber = ModDataComponents.getItemInSlot(rod, ModDataComponents.Slots.BOBBER);
+        this.bait = ModDataComponents.getItemInSlot(rod, ModDataComponents.Slots.BAIT);
+        this.hook = ModDataComponents.getItemInSlot(rod, ModDataComponents.Slots.HOOK);
 
         posTreasure = Integer.MIN_VALUE;
 
         //assign difficulty, if using mossy_hook it should make common, uncommon and rare into a harder difficulty
-        FishProperties.Difficulty difficulty = hook.is(ModItems.MOSSY_HOOK) &&
+        FishProperties.Difficulty difficulty = hook.is(ModItems.MOSSY_HOOK.get()) &&
                 (
                         fp.rarity() == FishProperties.Rarity.COMMON ||
                         fp.rarity() == FishProperties.Rarity.UNCOMMON ||
@@ -125,7 +127,7 @@ public class FishingMinigameScreen extends Screen implements GuiEventListener
         posThin2 = difficulty.hasSecondThinMarker() ? getRandomFreePosition() : Integer.MIN_VALUE;
 
         //make sweet spots fatter if difficulty bobber is being used
-        if(bobber.is(ModItems.STEADY_BOBBER))
+        if(bobber.is(ModItems.STEADY_BOBBER.get()))
         {
             bigForgiving = SIZE_4;
             thinForgiving = SIZE_2;
@@ -133,7 +135,7 @@ public class FishingMinigameScreen extends Screen implements GuiEventListener
             difficultyBobberOffset = 16;
         }
 
-        hand = Minecraft.getInstance().player.getMainHandItem().is(ModItems.ROD) ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
+        hand = Minecraft.getInstance().player.getMainHandItem().is(ModItems.ROD.get()) ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
     }
 
     private int getRandomFreePosition()
@@ -159,11 +161,16 @@ public class FishingMinigameScreen extends Screen implements GuiEventListener
         return 0;
     }
 
-
     @Override
-    public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick)
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick)
     {
-        super.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
+//        super.render(guiGraphics, mouseX, mouseY, partialTick);
+//    }
+//
+//    @Override
+//    public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick)
+//    {
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
 
         partial = partialTick;
 
@@ -450,7 +457,7 @@ public class FishingMinigameScreen extends Screen implements GuiEventListener
                 consecutiveHits++;
                 if ((hasTreasure && r.nextFloat() > 0.9 /*0.9*/ && completion < 60 && !treasureActive && treasureProgress == Integer.MIN_VALUE)
                 ||
-                (consecutiveHits == 3 && treasureProgress == Integer.MIN_VALUE && hook.is(ModItems.SHINY_HOOK)))
+                (consecutiveHits == 3 && treasureProgress == Integer.MIN_VALUE && hook.is(ModItems.SHINY_HOOK.get())))
                 {
                     treasureActive = true;
                     posTreasure = getRandomFreePosition();
@@ -458,7 +465,7 @@ public class FishingMinigameScreen extends Screen implements GuiEventListener
                     treasureProgressSmooth = 0;
                 }
 
-                if(hook.is(ModItems.STONE_HOOK))
+                if(hook.is(ModItems.STONE_HOOK.get()))
                 {
                     if(fp.rarity() == FishProperties.Rarity.COMMON) gracePeriod = 40;
                     if(fp.rarity() == FishProperties.Rarity.UNCOMMON) gracePeriod = 20;
@@ -518,7 +525,7 @@ public class FishingMinigameScreen extends Screen implements GuiEventListener
         if (completionSmooth > 75)
         {
             //if completed treasure minigame, or is a perfect catch with the mossy hook
-            boolean awardTreasure = treasureProgressSmooth > 100 || (perfectCatch && hook.is(ModItems.MOSSY_HOOK));
+            boolean awardTreasure = treasureProgressSmooth > 100 || (perfectCatch && hook.is(ModItems.MOSSY_HOOK.get()));
 
             PacketDistributor.sendToServer(new Payloads.FishingCompletedPayload(tickCount, awardTreasure, perfectCatch, consecutiveHits));
             this.onClose();
@@ -547,7 +554,7 @@ public class FishingMinigameScreen extends Screen implements GuiEventListener
 
         for (int i = 0; i < count; i++)
         {
-            if(bobber.is(ModItems.GLITTER_BOBBER))
+            if(bobber.is(ModItems.GLITTER_BOBBER.get()))
             {
                 hitParticles.add(new HitFakeParticle(xPos, yPos, new Vector2d(r.nextFloat() * 2 - 1, r.nextFloat() * 2 - 1),
                         r.nextFloat(),
@@ -558,12 +565,14 @@ public class FishingMinigameScreen extends Screen implements GuiEventListener
                 continue;
             }
 
-            if(bobber.is(ModItems.COLORFUL_BOBBER))
+            if(bobber.is(ModItems.COLORFUL_BOBBER.get()))
             {
+                ColorfulBobber.BobberColor bobberColor = ModDataComponents.getBobberColor(bobber);
+
                 hitParticles.add(new HitFakeParticle(xPos, yPos, new Vector2d(r.nextFloat() * 2 - 1, r.nextFloat() * 2 - 1),
-                        bobber.get(ModDataComponents.BOBBER_COLOR).r(),
-                        bobber.get(ModDataComponents.BOBBER_COLOR).g(),
-                        bobber.get(ModDataComponents.BOBBER_COLOR).b(),
+                        bobberColor.r(),
+                        bobberColor.g(),
+                        bobberColor.b(),
                         1
                 ));
                 continue;

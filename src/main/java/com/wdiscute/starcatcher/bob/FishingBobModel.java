@@ -8,6 +8,7 @@ import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
+import net.minecraft.util.FastColor;
 
 public class FishingBobModel<T extends FishingBobEntity> extends HierarchicalModel<T>
 {
@@ -37,17 +38,11 @@ public class FishingBobModel<T extends FishingBobEntity> extends HierarchicalMod
     }
 
     @Override
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int p_170627_, int p_170628_, float p_170629_, float p_170630_, float p_170631_, float p_170632_)
+    public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha)
     {
-        super.renderToBuffer(poseStack, vertexConsumer, p_170627_, p_170628_, p_170629_, p_170630_, p_170631_, p_170632_);
-        root.render(poseStack, vertexConsumer, 0, 0);
+        super.renderToBuffer(poseStack, buffer, packedLight, packedOverlay, red, green, blue, alpha);
+        root.render(poseStack, buffer, packedLight, packedOverlay);
     }
-
-//    @Override
-//    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, int color)
-//    {
-//        root.render(poseStack, vertexConsumer, packedLight, packedOverlay, color);
-//    }
 
     @Override
     public ModelPart root()

@@ -43,14 +43,15 @@ public class FishingBobRenderer extends EntityRenderer<FishingBobEntity>
         poseStack.translate(0.0F, 1.5F, 0.0F);
         poseStack.scale(-1.0F, -1.0F, 1.0F);
         int color = 0xffff9999;
-        ItemStack bobber = fishingBobEntity.getData(ModDataAttachments.BOBBER).stack().copy();
+        ItemStack bobber = fishingBobEntity.bobber.copy();
         if (bobber.is(ModItems.COLORFUL_BOBBER.get()))
         {
-            //why is rendering so annoying
-            color = bobber.get(ModDataComponents.BOBBER_COLOR).getColorAsInt();
+            color = ModDataComponents.getBobberColor(bobber).getColorAsInt();
         }
+
         VertexConsumer vertexbobber = buffer.getBuffer(this.model.renderType(this.getTextureLocation(fishingBobEntity)));
-        this.model.renderToBuffer(poseStack, vertexbobber, packedLight, OverlayTexture.NO_OVERLAY, color);
+        //todo fix this
+        this.model.renderToBuffer(poseStack, vertexbobber, packedLight, OverlayTexture.NO_OVERLAY, 1, 1, 1, 1);
         poseStack.popPose();
 
 
@@ -95,7 +96,7 @@ public class FishingBobRenderer extends EntityRenderer<FishingBobEntity>
         f3 /= f6;
         f4 /= f6;
         f5 /= f6;
-        consumer.addVertex(pose, f, f1, f2).setColor(color).setNormal(pose, f3, f4, f5);
+        consumer.vertex(pose.pose(), f, f1, f2).color(color).normal(pose.normal(), f3, f4, f5).endVertex();
     }
 
     private static float fraction(int numerator, int denominator) {
@@ -105,7 +106,7 @@ public class FishingBobRenderer extends EntityRenderer<FishingBobEntity>
     private Vec3 getPlayerHandPos(Player player, float p_340872_, float partialTick) {
         int i = player.getMainArm() == HumanoidArm.RIGHT ? 1 : -1;
         ItemStack itemstack = player.getMainHandItem();
-        if (!itemstack.is(ModItems.ROD)) {
+        if (!itemstack.is(ModItems.ROD.get())) {
             i = -i;
         }
 

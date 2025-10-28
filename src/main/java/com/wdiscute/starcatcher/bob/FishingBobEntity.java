@@ -73,9 +73,11 @@ public class FishingBobEntity extends Projectile
 
         this.player = player;
         this.rod = rod;
-        this.bobber = rod.get(ModDataComponents.BOBBER).stack().copy();
-        this.bait = rod.get(ModDataComponents.BAIT).stack().copy();
-        this.hook = rod.get(ModDataComponents.HOOK).stack().copy();
+
+
+        this.bobber = ModDataComponents.getItemInSlot(rod, ModDataComponents.Slots.BOBBER);
+        this.bait = ModDataComponents.getItemInSlot(rod, ModDataComponents.Slots.BAIT);
+        this.hook = ModDataComponents.getItemInSlot(rod, ModDataComponents.Slots.HOOK);
 
         {
             this.setOwner(player);
@@ -106,7 +108,9 @@ public class FishingBobEntity extends Projectile
             this.xRotO = this.getXRot();
         }
 
-        if (!level.isClientSide) player.setData(ModDataAttachments.FISHING.get(), this.uuid.toString());
+        if (!level.isClientSide)
+            ModDataAttachments.setFishingUUID(this.uuid.toString());
+            //player.setData(ModDataAttachments.FISHING.get(), this.uuid.toString());
 
         currentState = FishHookState.FLYING;
     }
@@ -117,17 +121,20 @@ public class FishingBobEntity extends Projectile
         //server only
         List<FishProperties> available = new ArrayList<>(List.of());
 
-        List<TrophyProperties> trophiesCaught = new ArrayList<>(player.getData(ModDataAttachments.TROPHIES_CAUGHT));
+        //List<TrophyProperties> trophiesCaught = new ArrayList<>(player.getData(ModDataAttachments.TROPHIES_CAUGHT));
+        List<TrophyProperties> trophiesCaught = new ArrayList<>(ModDataAttachments.getTrophiesCaught(player));
 
         //-1 on the common to account for the default "fish" unfortunately, theres probably a way to fix this
-        TrophyProperties.RarityProgress all = new TrophyProperties.RarityProgress(0, player.getData(ModDataAttachments.FISHES_CAUGHT).size() - 1); //-1 to remove the default
+        //TrophyProperties.RarityProgress all = new TrophyProperties.RarityProgress(0, player.getData(ModDataAttachments.FISHES_CAUGHT).size() - 1); //-1 to remove the default
+        TrophyProperties.RarityProgress all = new TrophyProperties.RarityProgress(0, ModDataAttachments.getFishCaught(player).size() - 1); //-1 to remove the default
         TrophyProperties.RarityProgress common = new TrophyProperties.RarityProgress(0, -1);
         TrophyProperties.RarityProgress uncommon = TrophyProperties.RarityProgress.DEFAULT;
         TrophyProperties.RarityProgress rare = TrophyProperties.RarityProgress.DEFAULT;
         TrophyProperties.RarityProgress epic = TrophyProperties.RarityProgress.DEFAULT;
         TrophyProperties.RarityProgress legendary = TrophyProperties.RarityProgress.DEFAULT;
 
-        for (FishCaughtCounter fcc : player.getData(ModDataAttachments.FISHES_CAUGHT))
+        //for (FishCaughtCounter fcc : player.getData(ModDataAttachments.FISHES_CAUGHT))
+        for (FishCaughtCounter fcc : ModDataAttachments.getFishCaught(player))
         {
             all = new TrophyProperties.RarityProgress(all.total() + fcc.count(), all.unique());
 
@@ -163,10 +170,12 @@ public class FishingBobEntity extends Projectile
             )
             {
 
-                ItemStack is = new ItemStack(BuiltInRegistries.ITEM.get(tp.fp().fish().getKey()));
+                ItemStack is = new ItemStack(BuiltInRegistries.ITEM.get(tp.fp().fish().unwrapKey().get()));
                 is.set(ModDataComponents.TROPHY, tp);
                 if (!tp.customName().isEmpty())
-                    is.set(DataComponents.ITEM_NAME, Component.literal(tp.customName()));
+                    is.setHoverName(Component.literal(tp.customName()));
+                    //1.20 fix
+                    //is.set(DataComponents.ITEM_NAME, Component.literal(tp.customName()));
 
                 Entity itemFished = new ItemEntity(
                         level(), position().x, position().y + 1.2f, position().z,
@@ -182,8 +191,10 @@ public class FishingBobEntity extends Projectile
 
                 trophiesCaught.add(tp);
 
-                player.setData(ModDataAttachments.TROPHIES_CAUGHT, trophiesCaught);
-                player.setData(ModDataAttachments.FISHING, "");
+                ModDataAttachments.setTrophiesCaught(trophiesCaught);
+                //player.setData(ModDataAttachments.TROPHIES_CAUGHT, trophiesCaught);
+                ModDataAttachments.setFishingUUID("");
+                //player.setData(ModDataAttachments.FISHING, "");
                 kill();
                 return;
             }
@@ -203,7 +214,8 @@ public class FishingBobEntity extends Projectile
 
         if (available.isEmpty())
         {
-            player.setData(ModDataAttachments.FISHING, "");
+            ModDataAttachments.setFishingUUID("");
+            //player.setData(ModDataAttachments.FISHING, "");
             this.discard();
         }
 
@@ -211,7 +223,7 @@ public class FishingBobEntity extends Projectile
 
 
         //TODO CHANGE THIS PIECE OF CODE TO BE SOMEWHERE ELSE
-        if (fpToFish.skipMinigame() || bobber.is(ModItems.CREEPER_BOBBER))
+        if (fpToFish.skipMinigame() || bobber.is(ModItems.CREEPER_BOBBER.get()))
         {
             Entity itemFished = new ItemEntity(
                     level(),
@@ -249,7 +261,8 @@ public class FishingBobEntity extends Projectile
 
             level().addFreshEntity(itemFished);
 
-            player.setData(ModDataAttachments.FISHING, "");
+            ModDataAttachments.setFishingUUID("");
+            //player.setData(ModDataAttachments.FISHING, "");
 
             kill();
         }
@@ -275,7 +288,9 @@ public class FishingBobEntity extends Projectile
                 bait.setCount(bait.getCount() - 1);
             }
 
-            rod.set(ModDataComponents.BAIT, new SingleStackContainer(bait));
+            ModDataComponents.setItemInSlot(rod, ModDataComponents.Slots.BAIT, bait);
+            //1.20 fix
+            //rod.set(ModDataComponents.BAIT, new SingleStackContainer(bait));
         }
 
 
@@ -295,8 +310,8 @@ public class FishingBobEntity extends Projectile
         }
         else
         {
-            player.setData(ModDataAttachments.FISHING.get(), "");
-
+            ModDataAttachments.setFishingUUID("");
+            //player.setData(ModDataAttachments.FISHING.get(), "");
             this.discard();
             return true;
         }
@@ -314,7 +329,8 @@ public class FishingBobEntity extends Projectile
         super.lavaHurt();
         if (!hook.is(StarcatcherTags.HOOKS_SURVIVE_FIRE) && !level().isClientSide)
         {
-            player.setData(ModDataAttachments.FISHING, "");
+            ModDataAttachments.setFishingUUID("");
+            //player.setData(ModDataAttachments.FISHING, "");
             kill();
         }
     }
@@ -342,8 +358,9 @@ public class FishingBobEntity extends Projectile
         Player player = ((Player) this.getOwner());
         if (player == null || this.shouldStopFishing(player))
         {
+            ModDataAttachments.setFishingUUID("");
+            //player.setData(ModDataAttachments.FISHING.get(), "");
             this.discard();
-            player.setData(ModDataAttachments.FISHING.get(), "");
         }
 
         BlockPos blockpos = this.blockPosition();
@@ -378,7 +395,8 @@ public class FishingBobEntity extends Projectile
 
             if (timeBiting > 80)
             {
-                player.setData(ModDataAttachments.FISHING, "");
+                ModDataAttachments.setFishingUUID("");
+                //player.setData(ModDataAttachments.FISHING, "");
                 kill();
             }
         }

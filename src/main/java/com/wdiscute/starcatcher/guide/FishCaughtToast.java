@@ -10,13 +10,14 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.ItemStack;
+import org.joml.Math;
 
 import java.util.Random;
 
 
 public class FishCaughtToast implements Toast
 {
-    private static final ResourceLocation BACKGROUND_SPRITE = Starcatcher.rl("toast/fish_caught");
+    private static final ResourceLocation BACKGROUND_SPRITE = Starcatcher.rl("textures/gui/toast/fish_caught");
     private final Component title;
     private final String description;
     private static final String gibberish = "§kaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
@@ -34,13 +35,13 @@ public class FishCaughtToast implements Toast
 
     public Visibility render(GuiGraphics guiGraphics, ToastComponent toastComponent, long timeSinceLastVisible)
     {
-        guiGraphics.blitSprite(BACKGROUND_SPRITE, 0, 0, this.width(), this.height());
+        guiGraphics.blit(BACKGROUND_SPRITE, 0, 0, 0, 0, this.width(), this.height());
 
         guiGraphics.renderItem(is, 8, 8);
 
         guiGraphics.drawString(toastComponent.getMinecraft().font, this.title, 30, 7, 0, false);
 
-        int lettersRevealed = Math.clamp((timeSinceLastVisible - 500) / 150, 0, description.length());
+        int lettersRevealed = Math.clamp(((int) ((timeSinceLastVisible - 500) / 150)), 0, description.length());
 
         if(old != lettersRevealed)
         {

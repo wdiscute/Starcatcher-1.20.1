@@ -13,7 +13,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,30 +28,35 @@ public class AwardOneFish extends Item
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand)
     {
-        if(!player.isCreative())
-            return InteractionResultHolder.pass(player.getItemInHand(usedHand));List<FishCaughtCounter> fishCounter;
+        if (!player.isCreative())
+            return InteractionResultHolder.pass(player.getItemInHand(usedHand));
 
-        List<FishProperties> fishes = new ArrayList<>(player.getData(ModDataAttachments.FISHES_NOTIFICATION));
+        List<FishCaughtCounter> fishCounter;
 
-        fishCounter = new ArrayList<>(player.getData(ModDataAttachments.FISHES_CAUGHT));
+        List<FishProperties> fishesNotification = new ArrayList<>(ModDataAttachments.getFishesNotification(player));
+
+        fishCounter = new ArrayList<>(ModDataAttachments.getFishCaught(player));
 
         Optional<Holder.Reference<FishProperties>> optional = level.registryAccess().registryOrThrow(Starcatcher.FISH_REGISTRY).getRandom(level.random);
 
-        if(optional.isPresent())
+        if (optional.isPresent())
         {
             FishProperties fp = optional.get().value();
 
             fishCounter.add(new FishCaughtCounter(fp, 1, Integer.MAX_VALUE, 99999));
-            fishes.add(fp);
+            fishesNotification.add(fp);
 
-            if(player instanceof ServerPlayer sp)
+            if (player instanceof ServerPlayer sp)
             {
-                PacketDistributor.sendToPlayer(sp, new Payloads.FishCaughtPayload(fp));
+                //todo send notification
+                //PacketDistributor.sendToPlayer(sp, new Payloads.FishCaughtPayload(fp));
             }
         }
 
-        player.setData(ModDataAttachments.FISHES_CAUGHT, fishCounter);
-        player.setData(ModDataAttachments.FISHES_NOTIFICATION, fishes);
+        ModDataAttachments.setFishCaught(player, fishCounter);
+        //player.setData(ModDataAttachments.FISHES_CAUGHT, fishCounter);
+        ModDataAttachments.setFishesNotification(player, fishesNotification);
+        //player.setData(ModDataAttachments.FISHES_NOTIFICATION, fishesNotification);
 
         return InteractionResultHolder.success(player.getItemInHand(usedHand));
     }

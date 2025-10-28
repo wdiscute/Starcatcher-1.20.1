@@ -5,7 +5,6 @@ import com.wdiscute.starcatcher.Starcatcher;
 import com.wdiscute.starcatcher.bob.FishingBobEntity;
 import com.wdiscute.starcatcher.minigame.FishingMinigameScreen;
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -18,10 +17,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.network.PacketDistributor;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import org.joml.Math;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +36,7 @@ public class PayloadReceiver
 
         for (Entity entity : entities)
         {
-            if (entity.getUUID().toString().equals(player.getData(ModDataAttachments.FISHING.get())))
+            if (entity.getUUID().toString().equals(ModDataAttachments.getFishingUUID(player)))
             {
                 if (entity instanceof FishingBobEntity fbe)
                 {
@@ -61,22 +59,22 @@ public class PayloadReceiver
 
                         //assign custom name if fish has one
                         if (!fp.customName().isEmpty())
-                            is.set(DataComponents.ITEM_NAME, Component.literal(fp.customName()));
+                            is.setHoverName(Component.literal(fp.customName()));
 
                         //store fish properties in itemstack
-                        is.set(ModDataComponents.FISH_PROPERTIES, fp);
+                        ModDataComponents.setFishProperties(is, fp);
 
                         //split hook double drops
-                        if(data.perfectCatch() && fbe.hook.is(ModItems.SPLIT_HOOK)) is.setCount(2);
+                        if(data.perfectCatch() && fbe.hook.is(ModItems.SPLIT_HOOK.get())) is.setCount(2);
 
                         //make ItemEntities for fish and treasure
                         ItemEntity itemFished = new ItemEntity(level, fbe.position().x, fbe.position().y + 1.2f, fbe.position().z, is);
                         ItemEntity treasureFished = new ItemEntity(level, fbe.position().x, fbe.position().y + 1.2f, fbe.position().z, treasure);
 
                         //assign delta movement so fish flies towards player
-                        double x = Math.clamp((player.position().x - fbe.position().x) / 25, -1, 1);
-                        double y = Math.clamp((player.position().y - fbe.position().y) / 20, -1, 1);
-                        double z = Math.clamp((player.position().z - fbe.position().z) / 25, -1, 1);
+                        double x = Math.clamp(-1, 1, (player.position().x - fbe.position().x) / 25);
+                        double y = Math.clamp(-1, 1, (player.position().y - fbe.position().y) / 20);
+                        double z = Math.clamp(-1, 1, (player.position().z - fbe.position().z) / 25);
                         Vec3 vec3 = new Vec3(x, 0.7 + y, z);
                         itemFished.setDeltaMovement(vec3);
                         treasureFished.setDeltaMovement(vec3);
@@ -87,16 +85,17 @@ public class PayloadReceiver
 
                         //play sound
                         Vec3 p = player.position();
-                        level.playSound(null, p.x, p.y, p.z, SoundEvents.VILLAGER_CELEBRATE, SoundSource.AMBIENT);
+                        level.playSound(null, p.x, p.y, p.z, SoundEvents.VILLAGER_CELEBRATE, SoundSource.AMBIENT, 1f, 1f);
 
                         //award fish counter
                         if (FishCaughtCounter.AwardFishCaughtCounter(fbe.fpToFish, player, data.time()) && player instanceof ServerPlayer sp)
                             PacketDistributor.sendToPlayer(sp, new Payloads.FishCaughtPayload(fp));
 
                         //award fish counter
-                        List<FishProperties> list = new ArrayList<>(player.getData(ModDataAttachments.FISHES_NOTIFICATION));
+                        List<FishProperties> list = new ArrayList<>(ModDataAttachments.getFishesNotification(player));
                         list.add(fbe.fpToFish);
-                        player.setData(ModDataAttachments.FISHES_NOTIFICATION, list);
+                        ModDataAttachments.setFishesNotification(player, list);
+                        //player.setData(ModDataAttachments.FISHES_NOTIFICATION, list);
 
                         //award exp
                         int exp = 4;
@@ -104,7 +103,7 @@ public class PayloadReceiver
                         if(fp.rarity() == FishProperties.Rarity.RARE) exp = 12;
                         if(fp.rarity() == FishProperties.Rarity.EPIC) exp = 20;
                         if(fp.rarity() == FishProperties.Rarity.LEGENDARY) exp = 35;
-                        if(fbe.hook.is(ModItems.GOLD_HOOK)) exp *= (int) ((double) data.hits() / 3) + 1; //extra exp if gold hook is used
+                        if(fbe.hook.is(ModItems.GOLD_HOOK.get())) exp *= (int) ((double) data.hits() / 3) + 1; //extra exp if gold hook is used
                         player.giveExperiencePoints(exp);
 
                         //todo trigger item fished event
@@ -116,7 +115,7 @@ public class PayloadReceiver
                     {
                         //if fish minigame failed/canceled, play sound
                         Vec3 p = player.position();
-                        level.playSound(null, p.x, p.y, p.z, SoundEvents.VILLAGER_NO, SoundSource.AMBIENT);
+                        level.playSound(null, p.x, p.y, p.z, SoundEvents.VILLAGER_NO, SoundSource.AMBIENT, 1f, 1f);
                     }
 
                     fbe.kill();
@@ -124,15 +123,15 @@ public class PayloadReceiver
             }
         }
 
-        player.setData(ModDataAttachments.FISHING.get(), "");
-
-
+        ModDataAttachments.setFishingUUID(player, "");
+        //player.setData(ModDataAttachments.FISHING.get(), "");
     }
 
 
     public static void receiveFPsSeen(final Payloads.FPsSeen data, final IPayloadContext context)
     {
-        List<FishProperties> list = context.player().getData(ModDataAttachments.FISHES_NOTIFICATION);
+        Player player = context.player();
+        List<FishProperties> list = ModDataAttachments.getFishesNotification(player);
         List<FishProperties> newList = new ArrayList<>();
 
         for(FishProperties fp : list)
@@ -141,7 +140,8 @@ public class PayloadReceiver
                 newList.add(fp);
         }
 
-        context.player().setData(ModDataAttachments.FISHES_NOTIFICATION, newList);
+        ModDataAttachments.setFishesNotification(player, newList);
+        //context.player().setData(ModDataAttachments.FISHES_NOTIFICATION, newList);
     }
 
     public static void receiveFishCaught(final Payloads.FishCaughtPayload data, final IPayloadContext context)

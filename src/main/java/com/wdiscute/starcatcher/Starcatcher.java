@@ -12,6 +12,7 @@ import com.wdiscute.starcatcher.particles.FishingBitingParticles;
 import com.wdiscute.starcatcher.particles.FishingNotificationParticles;
 import com.wdiscute.starcatcher.rod.FishingRodScreen;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.client.resources.language.I18n;
@@ -38,6 +39,7 @@ import net.minecraftforge.registries.DataPackRegistryEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.slf4j.Logger;
 
+import javax.tools.Tool;
 import java.util.List;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
@@ -69,12 +71,15 @@ public class Starcatcher
     {
         ModCreativeModeTabs.register(eventBus);
         ModItems.register(eventBus);
-        ModDataComponents.register(eventBus);
+        //ModDataComponents.register(eventBus);
         ModSounds.register(eventBus);
         ModEntities.register(eventBus);
         ModParticles.register(eventBus);
         ModMenuTypes.register(eventBus);
-        ModDataAttachments.register(eventBus);
+        //ModDataAttachments.register(eventBus);
+
+        eventBus.addListener(Tooltips::modifyItemTooltip);
+        eventBus.addListener(Tooltips::renderFrame);
 
         //modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }
@@ -251,7 +256,10 @@ public class Starcatcher
             EntityRenderers.register(ModEntities.FISHING_BOB.get(), FishingBobRenderer::new);
             EntityRenderers.register(ModEntities.BOTTLE.get(), ThrownItemRenderer::new);
             EntityRenderers.register(ModEntities.FISH.get(), FishRenderer::new);
+
             ModItemProperties.addCustomItemProperties();
+
+            MenuScreens.register(ModMenuTypes.FISHING_ROD_MENU.get(), FishingRodScreen::new);
         }
 
         @SubscribeEvent
@@ -266,13 +274,6 @@ public class Starcatcher
             event.registerSpriteSet(ModParticles.FISHING_NOTIFICATION.get(), FishingNotificationParticles.Provider::new);
             event.registerSpriteSet(ModParticles.FISHING_BITING.get(), FishingBitingParticles.Provider::new);
         }
-
-        @SubscribeEvent
-        public static void registerScreens(RegisterMenuScreensEvent event)
-        {
-            event.register(ModMenuTypes.FISHING_ROD_MENU.get(), FishingRodScreen::new);
-        }
-
 
         @SubscribeEvent
         public static void registerLayers(EntityRenderersEvent.RegisterLayerDefinitions event)

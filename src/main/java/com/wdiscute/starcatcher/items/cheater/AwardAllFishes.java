@@ -36,14 +36,16 @@ public class AwardAllFishes extends Item
             fishCounter.add(new FishCaughtCounter(fp, 1, Integer.MAX_VALUE, 99999));
         }
 
-        player.setData(ModDataAttachments.FISHES_CAUGHT, fishCounter);
+        ModDataAttachments.setFishCaught(player, fishCounter);
+        //player.setData(ModDataAttachments.FISHES_CAUGHT, fishCounater);
 
         for (FishProperties fp : level.registryAccess().registryOrThrow(Starcatcher.FISH_REGISTRY))
         {
             fishes.add(fp);
         }
 
-        player.setData(ModDataAttachments.FISHES_NOTIFICATION, fishes);
+        ModDataAttachments.setFishesNotification(player, fishes);
+        //player.setData(ModDataAttachments.FISHES_NOTIFICATION, fishes);
 
         return InteractionResultHolder.success(player.getItemInHand(usedHand));
     }

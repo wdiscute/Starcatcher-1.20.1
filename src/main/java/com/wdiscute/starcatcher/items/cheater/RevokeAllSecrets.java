@@ -23,14 +23,16 @@ public class RevokeAllSecrets extends Item
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand)
     {
         //revoke all secrets
-        List<TrophyProperties> list = new ArrayList<>(player.getData(ModDataAttachments.TROPHIES_CAUGHT));
+        List<TrophyProperties> list = new ArrayList<>(ModDataAttachments.getTrophiesCaught(player));
+        //List<TrophyProperties> list = new ArrayList<>(player.getData(ModDataAttachments.TROPHIES_CAUGHT));
 
-        player.getData(ModDataAttachments.TROPHIES_CAUGHT).forEach(tp ->
+        ModDataAttachments.getTrophiesCaught(player).forEach(tp ->
         {
             if(tp.trophyType() == TrophyProperties.TrophyType.SECRET) list.remove(tp);
         });
 
-        player.setData(ModDataAttachments.TROPHIES_CAUGHT, list);
+        ModDataAttachments.setTrophiesCaught(player, list);
+        //player.setData(ModDataAttachments.TROPHIES_CAUGHT, list);
         return InteractionResultHolder.success(player.getItemInHand(usedHand));
     }
 

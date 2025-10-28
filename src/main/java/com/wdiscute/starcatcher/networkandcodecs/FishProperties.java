@@ -1,23 +1,16 @@
 package com.wdiscute.starcatcher.networkandcodecs;
 
-import com.mojang.datafixers.util.*;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.wdiscute.starcatcher.ModItems;
 import com.wdiscute.starcatcher.Starcatcher;
 import com.wdiscute.starcatcher.StarcatcherTags;
 import com.wdiscute.starcatcher.bob.FishingBobEntity;
-import com.wdiscute.starcatcher.datagen.FishPropertiesWithModRestriction;
-import io.netty.buffer.ByteBuf;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BiomeTags;
@@ -31,7 +24,6 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
-import net.neoforged.neoforge.network.codec.NeoForgeStreamCodecs;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,28 +70,28 @@ public record FishProperties(
 
     public static final Codec<List<FishProperties>> LIST_CODEC = FishProperties.CODEC.listOf();
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, FishProperties> STREAM_CODEC = composite(
-            ByteBufCodecs.holderRegistry(Registries.ITEM), FishProperties::fish,
-            ByteBufCodecs.VAR_INT, FishProperties::baseChance,
-            ByteBufCodecs.STRING_UTF8, FishProperties::customName,
-            Rarity.STREAM_CODEC, FishProperties::rarity,
-            WorldRestrictions.STREAM_CODEC, FishProperties::wr,
-            BaitRestrictions.STREAM_CODEC, FishProperties::br,
-            Difficulty.STREAM_CODEC, FishProperties::dif,
-            Daytime.STREAM_CODEC, FishProperties::daytime,
-            Weather.STREAM_CODEC, FishProperties::weather,
-            ByteBufCodecs.VAR_INT, FishProperties::mustBeCaughtBelowY,
-            ByteBufCodecs.VAR_INT, FishProperties::mustBeCaughtAboveY,
-            ByteBufCodecs.BOOL, FishProperties::skipMinigame,
-            ByteBufCodecs.BOOL, FishProperties::hasGuideEntry,
-            FishProperties::new
-    );
+//    public static final StreamCodec<RegistryFriendlyByteBuf, FishProperties> STREAM_CODEC = composite(
+//            ByteBufCodecs.holderRegistry(Registries.ITEM), FishProperties::fish,
+//            ByteBufCodecs.VAR_INT, FishProperties::baseChance,
+//            ByteBufCodecs.STRING_UTF8, FishProperties::customName,
+//            Rarity.STREAM_CODEC, FishProperties::rarity,
+//            WorldRestrictions.STREAM_CODEC, FishProperties::wr,
+//            BaitRestrictions.STREAM_CODEC, FishProperties::br,
+//            Difficulty.STREAM_CODEC, FishProperties::dif,
+//            Daytime.STREAM_CODEC, FishProperties::daytime,
+//            Weather.STREAM_CODEC, FishProperties::weather,
+//            ByteBufCodecs.VAR_INT, FishProperties::mustBeCaughtBelowY,
+//            ByteBufCodecs.VAR_INT, FishProperties::mustBeCaughtAboveY,
+//            ByteBufCodecs.BOOL, FishProperties::skipMinigame,
+//            ByteBufCodecs.BOOL, FishProperties::hasGuideEntry,
+//            FishProperties::new
+//    );
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, List<FishProperties>> STREAM_CODEC_LIST = STREAM_CODEC.apply(ByteBufCodecs.list());
+    //public static final StreamCodec<RegistryFriendlyByteBuf, List<FishProperties>> STREAM_CODEC_LIST = STREAM_CODEC.apply(ByteBufCodecs.list());
 
 
     public static final FishProperties DEFAULT = new FishProperties(
-            ModItems.MISSINGNO,
+            ModItems.MISSINGNO.getHolder().get(),
             5,
             "",
             Rarity.COMMON,
@@ -116,11 +108,6 @@ public record FishProperties(
 
 
     //region with()
-
-    public FishPropertiesWithModRestriction withMod(String modid)
-    {
-        return new FishPropertiesWithModRestriction(this, modid);
-    }
 
     public FishProperties withFish(Holder<Item> fish)
     {
@@ -210,15 +197,15 @@ public record FishProperties(
                 ).apply(instance, BaitRestrictions::new));
 
 
-        public static final StreamCodec<ByteBuf, BaitRestrictions> STREAM_CODEC = StreamCodec.composite(
-                ByteBufCodecs.fromCodec(Codec.list(ResourceLocation.CODEC)), BaitRestrictions::correctBobber,
-                ByteBufCodecs.fromCodec(Codec.list(ResourceLocation.CODEC)), BaitRestrictions::correctBait,
-                ByteBufCodecs.BOOL, BaitRestrictions::consumesBait,
-                ByteBufCodecs.INT, BaitRestrictions::correctBaitChanceAdded,
-                ByteBufCodecs.fromCodec(Codec.list(ResourceLocation.CODEC)), BaitRestrictions::incorrectBaits,
-                ByteBufCodecs.BOOL, BaitRestrictions::mustHaveCorrectBait,
-                BaitRestrictions::new
-        );
+//        public static final StreamCodec<ByteBuf, BaitRestrictions> STREAM_CODEC = StreamCodec.composite(
+//                ByteBufCodecs.fromCodec(Codec.list(ResourceLocation.CODEC)), BaitRestrictions::correctBobber,
+//                ByteBufCodecs.fromCodec(Codec.list(ResourceLocation.CODEC)), BaitRestrictions::correctBait,
+//                ByteBufCodecs.BOOL, BaitRestrictions::consumesBait,
+//                ByteBufCodecs.INT, BaitRestrictions::correctBaitChanceAdded,
+//                ByteBufCodecs.fromCodec(Codec.list(ResourceLocation.CODEC)), BaitRestrictions::incorrectBaits,
+//                ByteBufCodecs.BOOL, BaitRestrictions::mustHaveCorrectBait,
+//                BaitRestrictions::new
+//        );
 
         public static final BaitRestrictions DEFAULT = new BaitRestrictions(
                 List.of(),
@@ -348,16 +335,16 @@ public record FishProperties(
                 ).apply(instance, WorldRestrictions::new));
 
 
-        public static final StreamCodec<ByteBuf, WorldRestrictions> STREAM_CODEC = composite(
-                ByteBufCodecs.fromCodec(Codec.list(ResourceLocation.CODEC)), WorldRestrictions::dims,
-                ByteBufCodecs.fromCodec(Codec.list(ResourceLocation.CODEC)), WorldRestrictions::dimsBlacklist,
-                ByteBufCodecs.fromCodec(Codec.list(ResourceLocation.CODEC)), WorldRestrictions::biomes,
-                ByteBufCodecs.fromCodec(Codec.list(ResourceLocation.CODEC)), WorldRestrictions::biomesTags,
-                ByteBufCodecs.fromCodec(Codec.list(ResourceLocation.CODEC)), WorldRestrictions::biomesBlacklist,
-                ByteBufCodecs.fromCodec(Codec.list(ResourceLocation.CODEC)), WorldRestrictions::biomesBlacklistTags,
-                ByteBufCodecs.fromCodec(Codec.list(ResourceLocation.CODEC)), WorldRestrictions::fluids,
-                WorldRestrictions::new
-        );
+//        public static final StreamCodec<ByteBuf, WorldRestrictions> STREAM_CODEC = composite(
+//                ByteBufCodecs.fromCodec(Codec.list(ResourceLocation.CODEC)), WorldRestrictions::dims,
+//                ByteBufCodecs.fromCodec(Codec.list(ResourceLocation.CODEC)), WorldRestrictions::dimsBlacklist,
+//                ByteBufCodecs.fromCodec(Codec.list(ResourceLocation.CODEC)), WorldRestrictions::biomes,
+//                ByteBufCodecs.fromCodec(Codec.list(ResourceLocation.CODEC)), WorldRestrictions::biomesTags,
+//                ByteBufCodecs.fromCodec(Codec.list(ResourceLocation.CODEC)), WorldRestrictions::biomesBlacklist,
+//                ByteBufCodecs.fromCodec(Codec.list(ResourceLocation.CODEC)), WorldRestrictions::biomesBlacklistTags,
+//                ByteBufCodecs.fromCodec(Codec.list(ResourceLocation.CODEC)), WorldRestrictions::fluids,
+//                WorldRestrictions::new
+//        );
 
         public static final WorldRestrictions DEFAULT = new WorldRestrictions(
                 List.of(),
@@ -588,12 +575,12 @@ public record FishProperties(
                         Codec.INT.optionalFieldOf("hit_reward", 0).forGetter(Treasure::hitReward)
                 ).apply(instance, Treasure::new));
 
-        public static final StreamCodec<ByteBuf, Treasure> STREAM_CODEC = StreamCodec.composite(
-                ByteBufCodecs.BOOL, Treasure::hasTreasure,
-                ResourceLocation.STREAM_CODEC, Treasure::loot,
-                ByteBufCodecs.INT, Treasure::hitReward,
-                Treasure::new
-        );
+//        public static final StreamCodec<ByteBuf, Treasure> STREAM_CODEC = StreamCodec.composite(
+//                ByteBufCodecs.BOOL, Treasure::hasTreasure,
+//                ResourceLocation.STREAM_CODEC, Treasure::loot,
+//                ByteBufCodecs.INT, Treasure::hitReward,
+//                Treasure::new
+//        );
 
         public static final Treasure DEFAULT = new Treasure(
                 false,
@@ -817,20 +804,20 @@ public record FishProperties(
                 ).apply(instance, Difficulty::new));
 
 
-        public static final StreamCodec<ByteBuf, Difficulty> STREAM_CODEC = composite(
-                ByteBufCodecs.INT, Difficulty::speed,
-                ByteBufCodecs.INT, Difficulty::reward,
-                ByteBufCodecs.INT, Difficulty::rewardThin,
-                ByteBufCodecs.INT, Difficulty::penalty,
-                ByteBufCodecs.INT, Difficulty::decay,
-                ByteBufCodecs.BOOL, Difficulty::hasFirstMarker,
-                ByteBufCodecs.BOOL, Difficulty::hasSecondMarker,
-                ByteBufCodecs.BOOL, Difficulty::hasFirstThinMarker,
-                ByteBufCodecs.BOOL, Difficulty::hasSecondThinMarker,
-                Treasure.STREAM_CODEC, Difficulty::treasure,
-                ByteBufCodecs.BOOL, Difficulty::changeRotationOnEveryHit,
-                Difficulty::new
-        );
+//        public static final StreamCodec<ByteBuf, Difficulty> STREAM_CODEC = composite(
+//                ByteBufCodecs.INT, Difficulty::speed,
+//                ByteBufCodecs.INT, Difficulty::reward,
+//                ByteBufCodecs.INT, Difficulty::rewardThin,
+//                ByteBufCodecs.INT, Difficulty::penalty,
+//                ByteBufCodecs.INT, Difficulty::decay,
+//                ByteBufCodecs.BOOL, Difficulty::hasFirstMarker,
+//                ByteBufCodecs.BOOL, Difficulty::hasSecondMarker,
+//                ByteBufCodecs.BOOL, Difficulty::hasFirstThinMarker,
+//                ByteBufCodecs.BOOL, Difficulty::hasSecondThinMarker,
+//                Treasure.STREAM_CODEC, Difficulty::treasure,
+//                ByteBufCodecs.BOOL, Difficulty::changeRotationOnEveryHit,
+//                Difficulty::new
+//        );
     }
 
     //endregion dif
@@ -844,7 +831,7 @@ public record FishProperties(
         LEGENDARY("legendary");
 
         public static final Codec<Rarity> CODEC = StringRepresentable.fromEnum(Rarity::values);
-        public static final StreamCodec<FriendlyByteBuf, Rarity> STREAM_CODEC = NeoForgeStreamCodecs.enumCodec(Rarity.class);
+        //public static final StreamCodec<FriendlyByteBuf, Rarity> STREAM_CODEC = NeoForgeStreamCodecs.enumCodec(Rarity.class);
         private final String key;
 
         Rarity(String key)
@@ -867,7 +854,7 @@ public record FishProperties(
         MIDNIGHT("midnight");
 
         public static final Codec<Daytime> CODEC = StringRepresentable.fromEnum(Daytime::values);
-        public static final StreamCodec<FriendlyByteBuf, Daytime> STREAM_CODEC = NeoForgeStreamCodecs.enumCodec(Daytime.class);
+        //public static final StreamCodec<FriendlyByteBuf, Daytime> STREAM_CODEC = NeoForgeStreamCodecs.enumCodec(Daytime.class);
         private final String key;
 
         Daytime(String key)
@@ -889,7 +876,7 @@ public record FishProperties(
         THUNDER("thunder");
 
         public static final Codec<Weather> CODEC = StringRepresentable.fromEnum(Weather::values);
-        public static final StreamCodec<FriendlyByteBuf, Weather> STREAM_CODEC = NeoForgeStreamCodecs.enumCodec(Weather.class);
+        //public static final StreamCodec<FriendlyByteBuf, Weather> STREAM_CODEC = NeoForgeStreamCodecs.enumCodec(Weather.class);
         private final String key;
 
         Weather(String key)
@@ -919,7 +906,7 @@ public record FishProperties(
             {
                 for (Holder<Biome> biomeHolder : optional.get())
                 {
-                    String biomeString = biomeHolder.getRegisteredName();
+                    String biomeString = biomeHolder.unwrapKey().get().location().toString();
 
                     rls.add(ResourceLocation.parse(biomeString));
                 }
@@ -951,7 +938,7 @@ public record FishProperties(
             {
                 for (Holder<Biome> biomeHolder : optional.get())
                 {
-                    String biomeString = biomeHolder.getRegisteredName();
+                    String biomeString = biomeHolder.unwrapKey().get().location().toString();
 
                     rls.add(ResourceLocation.parse(biomeString));
                 }
@@ -984,8 +971,8 @@ public record FishProperties(
 
         int chance = fp.baseChance();
 
-        ItemStack bobber = rod.get(ModDataComponents.BOBBER).stack().copy();
-        ItemStack bait = rod.get(ModDataComponents.BAIT).stack().copy();
+        ItemStack bobber = ModDataComponents.getItemInSlot(rod, ModDataComponents.Slots.BOBBER);
+        ItemStack bait = ModDataComponents.getItemInSlot(rod, ModDataComponents.Slots.BAIT);
 
         //dimension  check
         if (!fp.wr.dims.isEmpty() && !fp.wr().dims().contains(level.dimension().location()))
@@ -997,7 +984,7 @@ public record FishProperties(
         //biome check
         List<ResourceLocation> biomes = getBiomesAsList(fp, level);
         List<ResourceLocation> blacklist = getBiomesBlacklistAsList(fp, level);
-        ResourceLocation currentBiome = level.getBiome(entity.blockPosition()).getKey().location();
+        ResourceLocation currentBiome = level.getBiome(entity.blockPosition()).unwrapKey().get().location();
 
         if (!biomes.isEmpty() && !biomes.contains(currentBiome))
             return 0;
@@ -1040,25 +1027,25 @@ public record FishProperties(
 
             switch (fp.daytime())
             {
-                case Daytime.DAY:
+                case DAY:
                     if (!(time > 23000 || time < 12700)) return 0;
                     break;
 
-                case Daytime.NOON:
+                case NOON:
                     if (!(time > 3500 && time < 8500)) return 0;
                     break;
 
-                case Daytime.NIGHT:
+                case NIGHT:
                     if (!(time < 23000 && time > 12700)) return 0;
                     break;
 
-                case Daytime.MIDNIGHT:
+                case MIDNIGHT:
                     if (!(time > 16500 && time < 19500)) return 0;
                     break;
             }
         }
 
-        if(!bait.is(ModItems.METEOROLOGICAL_BAIT))
+        if(!bait.is(ModItems.METEOROLOGICAL_BAIT.get()))
         {
             //clear check
             if (fp.weather() == Weather.CLEAR && (level.getRainLevel(0) > 0.5 || level.getThunderLevel(0) > 0.5))
@@ -1120,424 +1107,5 @@ public record FishProperties(
 
         return fluid1;
     }
-
-
-    //region composite
-
-    static <B, C, T1, T2, T3, T4, T5, T6, T7> StreamCodec<B, C> composite(
-            final StreamCodec<? super B, T1> codec1,
-            final Function<C, T1> getter1,
-            final StreamCodec<? super B, T2> codec2,
-            final Function<C, T2> getter2,
-            final StreamCodec<? super B, T3> codec3,
-            final Function<C, T3> getter3,
-            final StreamCodec<? super B, T4> codec4,
-            final Function<C, T4> getter4,
-            final StreamCodec<? super B, T5> codec5,
-            final Function<C, T5> getter5,
-            final StreamCodec<? super B, T6> codec6,
-            final Function<C, T6> getter6,
-            final StreamCodec<? super B, T7> codec7,
-            final Function<C, T7> getter7,
-            final Function7<T1, T2, T3, T4, T5, T6, T7, C> factory
-    )
-    {
-        return new StreamCodec<B, C>()
-        {
-            @Override
-            public C decode(B decode)
-            {
-                T1 t1 = codec1.decode(decode);
-                T2 t2 = codec2.decode(decode);
-                T3 t3 = codec3.decode(decode);
-                T4 t4 = codec4.decode(decode);
-                T5 t5 = codec5.decode(decode);
-                T6 t6 = codec6.decode(decode);
-                T7 t7 = codec7.decode(decode);
-                return factory.apply(t1, t2, t3, t4, t5, t6, t7);
-            }
-
-            @Override
-            public void encode(B encode, C apply)
-            {
-                codec1.encode(encode, getter1.apply(apply));
-                codec2.encode(encode, getter2.apply(apply));
-                codec3.encode(encode, getter3.apply(apply));
-                codec4.encode(encode, getter4.apply(apply));
-                codec5.encode(encode, getter5.apply(apply));
-                codec6.encode(encode, getter6.apply(apply));
-                codec7.encode(encode, getter7.apply(apply));
-            }
-        };
-    }
-
-    static <B, C, T1, T2, T3, T4, T5, T6, T7, T8> StreamCodec<B, C> composite(
-            final StreamCodec<? super B, T1> codec1,
-            final Function<C, T1> getter1,
-            final StreamCodec<? super B, T2> codec2,
-            final Function<C, T2> getter2,
-            final StreamCodec<? super B, T3> codec3,
-            final Function<C, T3> getter3,
-            final StreamCodec<? super B, T4> codec4,
-            final Function<C, T4> getter4,
-            final StreamCodec<? super B, T5> codec5,
-            final Function<C, T5> getter5,
-            final StreamCodec<? super B, T6> codec6,
-            final Function<C, T6> getter6,
-            final StreamCodec<? super B, T7> codec7,
-            final Function<C, T7> getter7,
-            final StreamCodec<? super B, T8> codec8,
-            final Function<C, T8> getter8,
-            final Function8<T1, T2, T3, T4, T5, T6, T7, T8, C> factory
-    )
-    {
-        return new StreamCodec<B, C>()
-        {
-            @Override
-            public C decode(B decode)
-            {
-                T1 t1 = codec1.decode(decode);
-                T2 t2 = codec2.decode(decode);
-                T3 t3 = codec3.decode(decode);
-                T4 t4 = codec4.decode(decode);
-                T5 t5 = codec5.decode(decode);
-                T6 t6 = codec6.decode(decode);
-                T7 t7 = codec7.decode(decode);
-                T8 t8 = codec8.decode(decode);
-                return factory.apply(t1, t2, t3, t4, t5, t6, t7, t8);
-            }
-
-            @Override
-            public void encode(B encode, C apply)
-            {
-                codec1.encode(encode, getter1.apply(apply));
-                codec2.encode(encode, getter2.apply(apply));
-                codec3.encode(encode, getter3.apply(apply));
-                codec4.encode(encode, getter4.apply(apply));
-                codec5.encode(encode, getter5.apply(apply));
-                codec6.encode(encode, getter6.apply(apply));
-                codec7.encode(encode, getter7.apply(apply));
-                codec8.encode(encode, getter8.apply(apply));
-            }
-        };
-    }
-
-    static <B, C, T1, T2, T3, T4, T5, T6, T7, T8, T9> StreamCodec<B, C> composite(
-            final StreamCodec<? super B, T1> codec1,
-            final Function<C, T1> getter1,
-            final StreamCodec<? super B, T2> codec2,
-            final Function<C, T2> getter2,
-            final StreamCodec<? super B, T3> codec3,
-            final Function<C, T3> getter3,
-            final StreamCodec<? super B, T4> codec4,
-            final Function<C, T4> getter4,
-            final StreamCodec<? super B, T5> codec5,
-            final Function<C, T5> getter5,
-            final StreamCodec<? super B, T6> codec6,
-            final Function<C, T6> getter6,
-            final StreamCodec<? super B, T7> codec7,
-            final Function<C, T7> getter7,
-            final StreamCodec<? super B, T8> codec8,
-            final Function<C, T8> getter8,
-            final StreamCodec<? super B, T9> codec9,
-            final Function<C, T9> getter9,
-            final Function9<T1, T2, T3, T4, T5, T6, T7, T8, T9, C> factory
-    )
-    {
-        return new StreamCodec<B, C>()
-        {
-            @Override
-            public C decode(B decode)
-            {
-                T1 t1 = codec1.decode(decode);
-                T2 t2 = codec2.decode(decode);
-                T3 t3 = codec3.decode(decode);
-                T4 t4 = codec4.decode(decode);
-                T5 t5 = codec5.decode(decode);
-                T6 t6 = codec6.decode(decode);
-                T7 t7 = codec7.decode(decode);
-                T8 t8 = codec8.decode(decode);
-                T9 t9 = codec9.decode(decode);
-                return factory.apply(t1, t2, t3, t4, t5, t6, t7, t8, t9);
-            }
-
-            @Override
-            public void encode(B encode, C apply)
-            {
-                codec1.encode(encode, getter1.apply(apply));
-                codec2.encode(encode, getter2.apply(apply));
-                codec3.encode(encode, getter3.apply(apply));
-                codec4.encode(encode, getter4.apply(apply));
-                codec5.encode(encode, getter5.apply(apply));
-                codec6.encode(encode, getter6.apply(apply));
-                codec7.encode(encode, getter7.apply(apply));
-                codec8.encode(encode, getter8.apply(apply));
-                codec9.encode(encode, getter9.apply(apply));
-            }
-        };
-    }
-
-    static <B, C, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10> StreamCodec<B, C> composite(
-            final StreamCodec<? super B, T1> codec1,
-            final Function<C, T1> getter1,
-            final StreamCodec<? super B, T2> codec2,
-            final Function<C, T2> getter2,
-            final StreamCodec<? super B, T3> codec3,
-            final Function<C, T3> getter3,
-            final StreamCodec<? super B, T4> codec4,
-            final Function<C, T4> getter4,
-            final StreamCodec<? super B, T5> codec5,
-            final Function<C, T5> getter5,
-            final StreamCodec<? super B, T6> codec6,
-            final Function<C, T6> getter6,
-            final StreamCodec<? super B, T7> codec7,
-            final Function<C, T7> getter7,
-            final StreamCodec<? super B, T8> codec8,
-            final Function<C, T8> getter8,
-            final StreamCodec<? super B, T9> codec9,
-            final Function<C, T9> getter9,
-            final StreamCodec<? super B, T10> codec10,
-            final Function<C, T10> getter10,
-            final Function10<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, C> factory
-    )
-    {
-        return new StreamCodec<B, C>()
-        {
-            @Override
-            public C decode(B decode)
-            {
-                T1 t1 = codec1.decode(decode);
-                T2 t2 = codec2.decode(decode);
-                T3 t3 = codec3.decode(decode);
-                T4 t4 = codec4.decode(decode);
-                T5 t5 = codec5.decode(decode);
-                T6 t6 = codec6.decode(decode);
-                T7 t7 = codec7.decode(decode);
-                T8 t8 = codec8.decode(decode);
-                T9 t9 = codec9.decode(decode);
-                T10 t10 = codec10.decode(decode);
-                return factory.apply(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10);
-            }
-
-            @Override
-            public void encode(B encode, C apply)
-            {
-                codec1.encode(encode, getter1.apply(apply));
-                codec2.encode(encode, getter2.apply(apply));
-                codec3.encode(encode, getter3.apply(apply));
-                codec4.encode(encode, getter4.apply(apply));
-                codec5.encode(encode, getter5.apply(apply));
-                codec6.encode(encode, getter6.apply(apply));
-                codec7.encode(encode, getter7.apply(apply));
-                codec8.encode(encode, getter8.apply(apply));
-                codec9.encode(encode, getter9.apply(apply));
-                codec10.encode(encode, getter10.apply(apply));
-            }
-        };
-    }
-
-    static <B, C, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11> StreamCodec<B, C> composite(
-            final StreamCodec<? super B, T1> codec1,
-            final Function<C, T1> getter1,
-            final StreamCodec<? super B, T2> codec2,
-            final Function<C, T2> getter2,
-            final StreamCodec<? super B, T3> codec3,
-            final Function<C, T3> getter3,
-            final StreamCodec<? super B, T4> codec4,
-            final Function<C, T4> getter4,
-            final StreamCodec<? super B, T5> codec5,
-            final Function<C, T5> getter5,
-            final StreamCodec<? super B, T6> codec6,
-            final Function<C, T6> getter6,
-            final StreamCodec<? super B, T7> codec7,
-            final Function<C, T7> getter7,
-            final StreamCodec<? super B, T8> codec8,
-            final Function<C, T8> getter8,
-            final StreamCodec<? super B, T9> codec9,
-            final Function<C, T9> getter9,
-            final StreamCodec<? super B, T10> codec10,
-            final Function<C, T10> getter10,
-            final StreamCodec<? super B, T11> codec11,
-            final Function<C, T11> getter11,
-            final Function11<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, C> factory
-    )
-    {
-        return new StreamCodec<B, C>()
-        {
-            @Override
-            public C decode(B decode)
-            {
-                T1 t1 = codec1.decode(decode);
-                T2 t2 = codec2.decode(decode);
-                T3 t3 = codec3.decode(decode);
-                T4 t4 = codec4.decode(decode);
-                T5 t5 = codec5.decode(decode);
-                T6 t6 = codec6.decode(decode);
-                T7 t7 = codec7.decode(decode);
-                T8 t8 = codec8.decode(decode);
-                T9 t9 = codec9.decode(decode);
-                T10 t10 = codec10.decode(decode);
-                T11 t11 = codec11.decode(decode);
-                return factory.apply(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11);
-            }
-
-            @Override
-            public void encode(B encode, C apply)
-            {
-                codec1.encode(encode, getter1.apply(apply));
-                codec2.encode(encode, getter2.apply(apply));
-                codec3.encode(encode, getter3.apply(apply));
-                codec4.encode(encode, getter4.apply(apply));
-                codec5.encode(encode, getter5.apply(apply));
-                codec6.encode(encode, getter6.apply(apply));
-                codec7.encode(encode, getter7.apply(apply));
-                codec8.encode(encode, getter8.apply(apply));
-                codec9.encode(encode, getter9.apply(apply));
-                codec10.encode(encode, getter10.apply(apply));
-                codec11.encode(encode, getter11.apply(apply));
-            }
-        };
-    }
-
-
-    static <B, C, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12> StreamCodec<B, C> composite(
-            final StreamCodec<? super B, T1> codec1,
-            final Function<C, T1> getter1,
-            final StreamCodec<? super B, T2> codec2,
-            final Function<C, T2> getter2,
-            final StreamCodec<? super B, T3> codec3,
-            final Function<C, T3> getter3,
-            final StreamCodec<? super B, T4> codec4,
-            final Function<C, T4> getter4,
-            final StreamCodec<? super B, T5> codec5,
-            final Function<C, T5> getter5,
-            final StreamCodec<? super B, T6> codec6,
-            final Function<C, T6> getter6,
-            final StreamCodec<? super B, T7> codec7,
-            final Function<C, T7> getter7,
-            final StreamCodec<? super B, T8> codec8,
-            final Function<C, T8> getter8,
-            final StreamCodec<? super B, T9> codec9,
-            final Function<C, T9> getter9,
-            final StreamCodec<? super B, T10> codec10,
-            final Function<C, T10> getter10,
-            final StreamCodec<? super B, T11> codec11,
-            final Function<C, T11> getter11,
-            final StreamCodec<? super B, T12> codec12,
-            final Function<C, T12> getter12,
-            final Function12<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, C> factory
-    )
-    {
-        return new StreamCodec<B, C>()
-        {
-            @Override
-            public C decode(B decode)
-            {
-                T1 t1 = codec1.decode(decode);
-                T2 t2 = codec2.decode(decode);
-                T3 t3 = codec3.decode(decode);
-                T4 t4 = codec4.decode(decode);
-                T5 t5 = codec5.decode(decode);
-                T6 t6 = codec6.decode(decode);
-                T7 t7 = codec7.decode(decode);
-                T8 t8 = codec8.decode(decode);
-                T9 t9 = codec9.decode(decode);
-                T10 t10 = codec10.decode(decode);
-                T11 t11 = codec11.decode(decode);
-                T12 t12 = codec12.decode(decode);
-                return factory.apply(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12);
-            }
-
-            @Override
-            public void encode(B encode, C apply)
-            {
-                codec1.encode(encode, getter1.apply(apply));
-                codec2.encode(encode, getter2.apply(apply));
-                codec3.encode(encode, getter3.apply(apply));
-                codec4.encode(encode, getter4.apply(apply));
-                codec5.encode(encode, getter5.apply(apply));
-                codec6.encode(encode, getter6.apply(apply));
-                codec7.encode(encode, getter7.apply(apply));
-                codec8.encode(encode, getter8.apply(apply));
-                codec9.encode(encode, getter9.apply(apply));
-                codec10.encode(encode, getter10.apply(apply));
-                codec11.encode(encode, getter11.apply(apply));
-                codec12.encode(encode, getter12.apply(apply));
-            }
-        };
-    }
-
-    static <B, C, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13> StreamCodec<B, C> composite(
-            final StreamCodec<? super B, T1> codec1,
-            final Function<C, T1> getter1,
-            final StreamCodec<? super B, T2> codec2,
-            final Function<C, T2> getter2,
-            final StreamCodec<? super B, T3> codec3,
-            final Function<C, T3> getter3,
-            final StreamCodec<? super B, T4> codec4,
-            final Function<C, T4> getter4,
-            final StreamCodec<? super B, T5> codec5,
-            final Function<C, T5> getter5,
-            final StreamCodec<? super B, T6> codec6,
-            final Function<C, T6> getter6,
-            final StreamCodec<? super B, T7> codec7,
-            final Function<C, T7> getter7,
-            final StreamCodec<? super B, T8> codec8,
-            final Function<C, T8> getter8,
-            final StreamCodec<? super B, T9> codec9,
-            final Function<C, T9> getter9,
-            final StreamCodec<? super B, T10> codec10,
-            final Function<C, T10> getter10,
-            final StreamCodec<? super B, T11> codec11,
-            final Function<C, T11> getter11,
-            final StreamCodec<? super B, T12> codec12,
-            final Function<C, T12> getter12,
-            final StreamCodec<? super B, T13> codec13,
-            final Function<C, T13> getter13,
-            final Function13<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, C> factory
-    )
-    {
-        return new StreamCodec<B, C>()
-        {
-            @Override
-            public C decode(B decode)
-            {
-                T1 t1 = codec1.decode(decode);
-                T2 t2 = codec2.decode(decode);
-                T3 t3 = codec3.decode(decode);
-                T4 t4 = codec4.decode(decode);
-                T5 t5 = codec5.decode(decode);
-                T6 t6 = codec6.decode(decode);
-                T7 t7 = codec7.decode(decode);
-                T8 t8 = codec8.decode(decode);
-                T9 t9 = codec9.decode(decode);
-                T10 t10 = codec10.decode(decode);
-                T11 t11 = codec11.decode(decode);
-                T12 t12 = codec12.decode(decode);
-                T13 t13 = codec13.decode(decode);
-                return factory.apply(t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13);
-            }
-
-            @Override
-            public void encode(B encode, C apply)
-            {
-                codec1.encode(encode, getter1.apply(apply));
-                codec2.encode(encode, getter2.apply(apply));
-                codec3.encode(encode, getter3.apply(apply));
-                codec4.encode(encode, getter4.apply(apply));
-                codec5.encode(encode, getter5.apply(apply));
-                codec6.encode(encode, getter6.apply(apply));
-                codec7.encode(encode, getter7.apply(apply));
-                codec8.encode(encode, getter8.apply(apply));
-                codec9.encode(encode, getter9.apply(apply));
-                codec10.encode(encode, getter10.apply(apply));
-                codec11.encode(encode, getter11.apply(apply));
-                codec12.encode(encode, getter12.apply(apply));
-                codec13.encode(encode, getter13.apply(apply));
-            }
-        };
-    }
-
-    //endregion composite
 
 }

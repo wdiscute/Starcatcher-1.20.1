@@ -6,11 +6,9 @@ import com.wdiscute.starcatcher.Starcatcher;
 import com.wdiscute.starcatcher.networkandcodecs.FishCaughtCounter;
 import com.wdiscute.starcatcher.networkandcodecs.FishProperties;
 import com.wdiscute.starcatcher.networkandcodecs.ModDataAttachments;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.LayeredDraw;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -49,11 +47,12 @@ public class FishTrackerLayer implements IGuiOverlay
     {
         fpsInArea = FishProperties.getFpsWithGuideEntryForArea(player);
         fishesCaught = new ArrayList<>();
-        for (FishCaughtCounter fishes : player.getData(ModDataAttachments.FISHES_CAUGHT)) fishesCaught.add(fishes.fp());
+        for (FishCaughtCounter fishes : ModDataAttachments.getFishCaught(player)) fishesCaught.add(fishes.fp());
     }
 
+
     @Override
-    public void render(ForgeGui forgeGui, GuiGraphics guiGraphics, float v, int i, int i1)
+    public void render(ForgeGui forgeGui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight)
     {
         font = Minecraft.getInstance().font;
         uiX = Minecraft.getInstance().getWindow().getGuiScaledWidth() - imageWidth;
@@ -66,17 +65,21 @@ public class FishTrackerLayer implements IGuiOverlay
 
         boolean shouldShow = player.getMainHandItem().is(ModItems.FISH_SPOTTER.get()) || player.getOffhandItem().is(ModItems.FISH_SPOTTER.get());
 
+        forgeGui.getGuiTicks();
+
         //smoothly moves ui in and out of screen
         if (!shouldShow)
             if (offScreen > -150)
-                offScreen -= 15 * deltaTracker.getGameTimeDeltaTicks();
+                offScreen -= 15 * partialTick;
+                //offScreen -= 15 * deltaTracker.getGameTimeDeltaTicks();
             else
             {
                 offScreen = -150;
                 return;
             }
         else if (offScreen < 0)
-            offScreen += 15 * deltaTracker.getGameTimeDeltaTicks();
+            offScreen -= 15 * partialTick;
+            //offScreen += 15 * deltaTracker.getGameTimeDeltaTicks();
         else
             offScreen = 0;
 
@@ -91,7 +94,8 @@ public class FishTrackerLayer implements IGuiOverlay
         RenderSystem.disableBlend();
 
         //recalculate every 100 ticks?
-        counterSinceLastRefresh += 1 * deltaTracker.getGameTimeDeltaTicks();
+        counterSinceLastRefresh += 1 * partialTick;
+        //counterSinceLastRefresh += 1 * deltaTracker.getGameTimeDeltaTicks();
         if (counterSinceLastRefresh > 100) recalculate();
 
         for (int i = 0; i < fpsInArea.size(); i++)
@@ -109,9 +113,7 @@ public class FishTrackerLayer implements IGuiOverlay
                     uiY + 10 + i / 5 * 20);
         }
 
-
         guiGraphics.pose().popPose();
-
     }
 
     private void renderImage(GuiGraphics guiGraphics, ResourceLocation rl)

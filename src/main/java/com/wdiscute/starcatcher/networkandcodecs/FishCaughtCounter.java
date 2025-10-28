@@ -2,9 +2,6 @@ package com.wdiscute.starcatcher.networkandcodecs;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
@@ -27,15 +24,17 @@ public record FishCaughtCounter(
             ).apply(instance, FishCaughtCounter::new)
     );
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, FishCaughtCounter> STREAM_CODEC = StreamCodec.composite(
-            FishProperties.STREAM_CODEC, FishCaughtCounter::fp,
-            ByteBufCodecs.VAR_INT, FishCaughtCounter::count,
-            ByteBufCodecs.VAR_INT, FishCaughtCounter::fastestTicks,
-            ByteBufCodecs.FLOAT, FishCaughtCounter::averageTicks,
-            FishCaughtCounter::new
-    );
+    public static final FishCaughtCounter DEFAULT = new FishCaughtCounter(FishProperties.DEFAULT, 0, 0, 0);
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, List<FishCaughtCounter>> LIST_STREAM_CODEC = STREAM_CODEC.apply(ByteBufCodecs.list());
+//    public static final StreamCodec<RegistryFriendlyByteBuf, FishCaughtCounter> STREAM_CODEC = StreamCodec.composite(
+//            FishProperties.STREAM_CODEC, FishCaughtCounter::fp,
+//            ByteBufCodecs.VAR_INT, FishCaughtCounter::count,
+//            ByteBufCodecs.VAR_INT, FishCaughtCounter::fastestTicks,
+//            ByteBufCodecs.FLOAT, FishCaughtCounter::averageTicks,
+//            FishCaughtCounter::new
+//    );
+
+    //public static final StreamCodec<RegistryFriendlyByteBuf, List<FishCaughtCounter>> LIST_STREAM_CODEC = STREAM_CODEC.apply(ByteBufCodecs.list());
 
 
     public static final Codec<List<FishCaughtCounter>> LIST_CODEC = FishCaughtCounter.CODEC.listOf();
@@ -43,7 +42,9 @@ public record FishCaughtCounter(
 
     public static boolean AwardFishCaughtCounter(FishProperties fpCaught, Player player, int ticks)
     {
-        List<FishCaughtCounter> listFishCaughtCounter = player.getData(ModDataAttachments.FISHES_CAUGHT);
+
+        List<FishCaughtCounter> listFishCaughtCounter = ModDataAttachments.getFishCaught(player);
+        //List<FishCaughtCounter> listFishCaughtCounter = player.getData(ModDataAttachments.FISHES_CAUGHT);
         List<FishCaughtCounter> newlist = new ArrayList<>();
 
         boolean newFish = true;
@@ -68,7 +69,8 @@ public record FishCaughtCounter(
 
         if (newFish) newlist.add(new FishCaughtCounter(fpCaught, 1, ticks, ticks));
 
-        player.setData(ModDataAttachments.FISHES_CAUGHT, newlist);
+        ModDataAttachments.setFishCaught(player, newlist);
+        //player.setData(ModDataAttachments.FISHES_CAUGHT, newlist);
         return newFish;
     }
 

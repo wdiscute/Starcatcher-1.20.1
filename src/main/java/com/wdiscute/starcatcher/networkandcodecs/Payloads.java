@@ -65,6 +65,13 @@ public class Payloads
                 FishingCompletedPayload::handle,
                 Optional.of(NetworkDirection.PLAY_TO_SERVER));
 
+        CHANNEL.registerMessage(
+                id(), FishCaughtPayload.class,
+                FishCaughtPayload::encode,
+                FishCaughtPayload::decode,
+                FishCaughtPayload::handle,
+                Optional.of(NetworkDirection.PLAY_TO_CLIENT));
+
 
     }
 
@@ -209,9 +216,12 @@ public class Payloads
                                 level.playSound(null, p.x, p.y, p.z, SoundEvents.VILLAGER_CELEBRATE, SoundSource.AMBIENT, 1f, 1f);
 
                                 //award fish counter
-//                                if (FishCaughtCounter.AwardFishCaughtCounter(fbe.fpToFish, player, data.tickCount))
-//                                    PacketDistributor.sendToPlayer(sp, new Payloads.FishCaughtPayload(fp));
-                                //TODO SEND PACKET OF FISH CAUGHT TO PLAYER
+                                if (FishCaughtCounter.AwardFishCaughtCounter(fbe.fpToFish, player, data.tickCount))
+                                    Payloads.CHANNEL.send(
+                                            net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> player),
+                                            new Payloads.FishCaughtPayload(fp)
+                                    );
+                                //PacketDistributor.sendToPlayer(sp, new Payloads.FishCaughtPayload(fp));
 
                                 //award fish counter
                                 List<FishProperties> list = new ArrayList<>(ModDataAttachments.getFishesNotification(player));
@@ -253,24 +263,41 @@ public class Payloads
             });
         }
 
+    }
 
-//    public record FishCaughtPayload(FishProperties fp) implements CustomPacketPayload
-//    {
-//
-//        public static final Type<FishCaughtPayload> TYPE = new Type<>(Starcatcher.rl("fish_caught"));
-//
-//        public static final StreamCodec<ByteBuf, FishCaughtPayload> STREAM_CODEC = StreamCodec.composite(
-//                ByteBufCodecs.fromCodec(FishProperties.CODEC),
-//                FishCaughtPayload::fp,
-//                FishCaughtPayload::new
-//        );
-//
-//        @Override
-//        public Type<? extends CustomPacketPayload> type() {
-//            return TYPE;
-//        }
-//    }
-//
+    //send fishing start to client
+    public static class FishCaughtPayload
+    {
+        private final FishProperties fp;
+
+        public FishCaughtPayload(FishProperties fp)
+        {
+            this.fp = fp;
+        }
+
+        public static void encode(Payloads.FishCaughtPayload fishCaughtPayload, FriendlyByteBuf buf)
+        {
+            buf.writeJsonWithCodec(FishProperties.CODEC, fishCaughtPayload.fp);
+        }
+
+        public static Payloads.FishCaughtPayload decode(FriendlyByteBuf buf)
+        {
+            FishProperties fp = buf.readJsonWithCodec(FishProperties.CODEC);
+
+            return new Payloads.FishCaughtPayload(fp);
+        }
+
+        public static void handle(Payloads.FishCaughtPayload fishingPayload, Supplier<NetworkEvent.Context> context)
+        {
+            context.get().enqueueWork(() ->
+            {
+                Starcatcher.fishCaughtToast(fishingPayload.fp);
+            });
+            context.get().setPacketHandled(true);
+        }
+    }
+
+
 //    public record FPsSeen(List<FishProperties> fps) implements CustomPacketPayload
 //    {
 //
@@ -287,5 +314,4 @@ public class Payloads
 //            return TYPE;
 //        }
 //    }
-    }
 }

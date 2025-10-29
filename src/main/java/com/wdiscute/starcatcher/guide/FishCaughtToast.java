@@ -17,7 +17,7 @@ import java.util.Random;
 
 public class FishCaughtToast implements Toast
 {
-    private static final ResourceLocation BACKGROUND_SPRITE = Starcatcher.rl("textures/gui/toast/fish_caught");
+    private static final ResourceLocation BACKGROUND_SPRITE = Starcatcher.rl("textures/gui/toast/fish_caught.png");
     private final Component title;
     private final String description;
     private static final String gibberish = "§kaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
@@ -31,17 +31,18 @@ public class FishCaughtToast implements Toast
         this.is = new ItemStack(fp.fish());
         this.title = Component.translatable("gui.starcatcher.toast.fish_caught");
         this.description =  is.getHoverName().getString();
+        System.out.println("description " + description);
     }
 
     public Visibility render(GuiGraphics guiGraphics, ToastComponent toastComponent, long timeSinceLastVisible)
     {
-        guiGraphics.blit(BACKGROUND_SPRITE, 0, 0, 0, 0, this.width(), this.height());
+        guiGraphics.blit(BACKGROUND_SPRITE, 0, 0, 0, 0, 160, 30, 160, 30);
 
         guiGraphics.renderItem(is, 8, 8);
 
         guiGraphics.drawString(toastComponent.getMinecraft().font, this.title, 30, 7, 0, false);
 
-        int lettersRevealed = Math.clamp(((int) ((timeSinceLastVisible - 500) / 150)), 0, description.length());
+        int lettersRevealed = Math.clamp(0, description.length(), ((int) ((timeSinceLastVisible - 500) / 150)));
 
         if(old != lettersRevealed)
         {

@@ -23,6 +23,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.network.PacketDistributor;
+import net.minecraftforge.network.simple.SimpleChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -269,7 +271,14 @@ public class FishingBobEntity extends Projectile
         }
         else
         {
-            //todo send payload to start minigame
+
+            if(player instanceof ServerPlayer sp)
+            {
+                Payloads.CHANNEL.send(
+                        PacketDistributor.PLAYER.with(() -> sp),
+                        new Payloads.FishingPayload(fpToFish, rod)
+                );
+            }
 //            PacketDistributor.sendToPlayer(
 //                    ((ServerPlayer) player),
 //                    new Payloads.FishingPayload(fpToFish, rod)

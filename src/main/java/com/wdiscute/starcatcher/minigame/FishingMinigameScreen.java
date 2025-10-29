@@ -8,7 +8,6 @@ import com.wdiscute.starcatcher.Starcatcher;
 import com.wdiscute.starcatcher.items.ColorfulBobber;
 import com.wdiscute.starcatcher.networkandcodecs.FishProperties;
 import com.wdiscute.starcatcher.networkandcodecs.ModDataComponents;
-import com.wdiscute.starcatcher.networkandcodecs.PacketDistributor;
 import com.wdiscute.starcatcher.networkandcodecs.Payloads;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -21,9 +20,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.network.PacketDistributor;
 import org.joml.Quaternionf;
 import org.joml.Random;
 import org.joml.Vector2d;
@@ -35,7 +34,6 @@ public class FishingMinigameScreen extends Screen implements GuiEventListener
 {
     private static final Random r = new Random();
     private static final ResourceLocation TEXTURE = Starcatcher.rl("textures/gui/minigame.png");
-    private static final ResourceLocation TEXTURE_TEST = Starcatcher.rl("textures/gui/minigame2.png");
 
     private static final int SIZE_1 = 5;
     private static final int SIZE_2 = 7;
@@ -172,7 +170,8 @@ public class FishingMinigameScreen extends Screen implements GuiEventListener
 //    {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
 
-        partial = partialTick;
+        partial += partialTick;
+        partial = partial % 1;
 
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -326,7 +325,10 @@ public class FishingMinigameScreen extends Screen implements GuiEventListener
             float centerY = height / 2f;
 
             poseStack.translate(centerX, centerY, 0);
-            poseStack.mulPose(new Quaternionf().rotateZ((float) Math.toRadians(pointerPos + ((speed * partialTick) * currentRotation))));
+
+            System.out.println(partial);
+
+            poseStack.mulPose(new Quaternionf().rotateZ((float) Math.toRadians(pointerPos + ((speed * partial) * currentRotation))));
             poseStack.translate(-centerX, -centerY, 0);
 
             //16 offset on y for texture centering
@@ -527,7 +529,10 @@ public class FishingMinigameScreen extends Screen implements GuiEventListener
             //if completed treasure minigame, or is a perfect catch with the mossy hook
             boolean awardTreasure = treasureProgressSmooth > 100 || (perfectCatch && hook.is(ModItems.MOSSY_HOOK.get()));
 
-            //todo send packet to server of fishing completed successfully
+            Payloads.CHANNEL.send(
+                    PacketDistributor.SERVER.with(null),
+                    new Payloads.FishingCompletedPayload(tickCount, awardTreasure, perfectCatch, consecutiveHits)
+            );
             //PacketDistributor.sendToServer(new Payloads.FishingCompletedPayload(tickCount, awardTreasure, perfectCatch, consecutiveHits));
             this.onClose();
         }
@@ -539,8 +544,11 @@ public class FishingMinigameScreen extends Screen implements GuiEventListener
     @Override
     public void onClose()
     {
-        //todo send packet to server of fishing minigame failed
         //PacketDistributor.sendToServer(new Payloads.FishingCompletedPayload(-1, false, false, consecutiveHits));
+        Payloads.CHANNEL.send(
+                PacketDistributor.SERVER.with(null),
+                new Payloads.FishingCompletedPayload(-1, false, false, consecutiveHits)
+        );
         this.minecraft.popGuiLayer();
     }
 

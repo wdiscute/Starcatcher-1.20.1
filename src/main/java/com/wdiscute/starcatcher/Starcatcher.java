@@ -81,6 +81,8 @@ public class Starcatcher
         ModMenuTypes.register(eventBus);
         //ModDataAttachments.register(eventBus);
 
+        Payloads.register();
+
         //modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }
 
@@ -107,12 +109,6 @@ public class Starcatcher
 //        @SubscribeEvent
 //        public static void registerPayloads(RegisterPayloadHandlersEvent event)
 //        {
-//            final PayloadRegistrar registrar = event.registrar("1");
-//            registrar.playToClient(
-//                    Payloads.FishingPayload.TYPE,
-//                    Payloads.FishingPayload.STREAM_CODEC,
-//                    PayloadReceiver::receiveFishingClient
-//            );
 //
 //            registrar.playToServer(
 //                    Payloads.FishingCompletedPayload.TYPE,

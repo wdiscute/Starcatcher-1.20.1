@@ -70,6 +70,7 @@ public class FishingMinigameScreen extends Screen implements GuiEventListener
     int currentRotation = 1;
 
     float partial;
+    float partialPointerPosition;
 
     int completion = 20;
     int completionSmooth = 20;
@@ -169,6 +170,8 @@ public class FishingMinigameScreen extends Screen implements GuiEventListener
 //    public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick)
 //    {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
+
+        partialPointerPosition += partialTick;
 
         partial += partialTick;
         partial = partial % 1;
@@ -326,9 +329,9 @@ public class FishingMinigameScreen extends Screen implements GuiEventListener
 
             poseStack.translate(centerX, centerY, 0);
 
-            System.out.println(partial);
+            float positionpointerprecisebutfixedbecauseonedottwentybullshitwithpartialtickshappenedwherepartialticksareforsomereasonthepercentageofaticksincelastrenderedframelikeseriouslywhatthefuckisthiswhywouldthatbeagoodframeofreferenceforrenderingWHAT = pointerPos + ((speed * (partialPointerPosition - tickCount)) * currentRotation);
 
-            poseStack.mulPose(new Quaternionf().rotateZ((float) Math.toRadians(pointerPos + ((speed * partial) * currentRotation))));
+            poseStack.mulPose(new Quaternionf().rotateZ((float) Math.toRadians(positionpointerprecisebutfixedbecauseonedottwentybullshitwithpartialtickshappenedwherepartialticksareforsomereasonthepercentageofaticksincelastrenderedframelikeseriouslywhatthefuckisthiswhywouldthatbeagoodframeofreferenceforrenderingWHAT)));
             poseStack.translate(-centerX, -centerY, 0);
 
             //16 offset on y for texture centering

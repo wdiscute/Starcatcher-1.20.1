@@ -1,4 +1,9 @@
 {
+
+  "dimension.minecraft.overworld": "Overworld",
+  "dimension.minecraft.the_end": "The End",
+  "dimension.minecraft.the_nether": "The Nether",
+
   "creativetab.starcatcher.starcatcher": "Starcatcher",
 
   "tag.starcatcher.is_beach" : "Beaches",

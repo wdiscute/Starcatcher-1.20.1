@@ -18,6 +18,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -28,6 +29,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +62,6 @@ public class FishingGuideScreen extends Screen
     private static final ResourceLocation GLOW = Starcatcher.rl("textures/gui/guide/glow.png");
 
     private static final int MAX_HELP_PAGES = 4;
-    private static final Logger log = LoggerFactory.getLogger(FishingGuideScreen.class);
 
     final boolean advancedTooltips;
 
@@ -95,6 +96,7 @@ public class FishingGuideScreen extends Screen
 
     private final ItemStack trophies;
     private final ItemStack secrets;
+
     int uiX;
     int uiY;
 
@@ -1222,8 +1224,8 @@ public class FishingGuideScreen extends Screen
             }
             else
             {
-                //todo fix this
-                ResourceLocation rl = ResourceLocation.parse(level.getBiome(Minecraft.getInstance().player.blockPosition()).toString());
+
+                ResourceLocation rl = getBiomeRL(level.getBiome(Minecraft.getInstance().player.blockPosition()));
                 if (biomes.contains(rl))
                 {
                     comp = comp.copy().withStyle(Style.EMPTY.withColor(0x00AA00));
@@ -1538,6 +1540,11 @@ public class FishingGuideScreen extends Screen
             pose.popPose();
         }
 
+    }
+
+    public static ResourceLocation getBiomeRL(Holder<Biome> biome)
+    {
+        return ResourceLocation.parse(biome.unwrapKey().map((p_316542_) -> p_316542_.location().toString()).orElse("starcatcher:error"));
     }
 
     @Override

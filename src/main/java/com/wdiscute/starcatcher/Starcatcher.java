@@ -1,7 +1,6 @@
 package com.wdiscute.starcatcher;
 
 import com.mojang.logging.LogUtils;
-import com.wdiscute.starcatcher.bob.FishingBobEntity;
 import com.wdiscute.starcatcher.bob.FishingBobModel;
 import com.wdiscute.starcatcher.bob.FishingBobRenderer;
 import com.wdiscute.starcatcher.fishentity.FishEntity;
@@ -19,7 +18,6 @@ import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -29,7 +27,6 @@ import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -52,14 +49,15 @@ public class Starcatcher
     public static final ResourceKey<Registry<TrophyProperties>> TROPHY_REGISTRY =
             ResourceKey.createRegistryKey(Starcatcher.rl("trophy"));
 
-    private static final Logger LOGGER = LogUtils.getLogger();
-
     public static ResourceLocation rl(String s)
     {
         return ResourceLocation.fromNamespaceAndPath(Starcatcher.MOD_ID, s);
     }
 
     public static Map<Player, String> fishingPlayersMap = new HashMap<>();
+    public static Map<Player, List<FishCaughtCounter>> FPsCaught = new HashMap<>();
+    public static Map<Player, List<TrophyProperties>> TPsCaught = new HashMap<>();
+    public static Map<Player, List<FishProperties>> FPsNotifications = new HashMap<>();
 
     @OnlyIn(Dist.CLIENT)
     public static void fishCaughtToast(FishProperties fp)

@@ -19,6 +19,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.NetworkRegistry;
@@ -107,13 +109,16 @@ public class Payloads
 
         public static void handle(FishingPayload fishingPayload, Supplier<NetworkEvent.Context> context)
         {
-            context.get().enqueueWork(() ->
-            {
-                Minecraft.getInstance().setScreen(new FishingMinigameScreen(fishingPayload.fp, fishingPayload.rod));
-
-            });
+            context.get().enqueueWork(() -> clientScreen(fishingPayload.fp, fishingPayload.rod));
             context.get().setPacketHandled(true);
         }
+
+        @OnlyIn(Dist.CLIENT)
+        private static void clientScreen(FishProperties fp, ItemStack rod)
+        {
+            Minecraft.getInstance().setScreen(new FishingMinigameScreen(fp, rod));
+        }
+
     }
 
 

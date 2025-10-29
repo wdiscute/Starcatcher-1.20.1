@@ -68,31 +68,35 @@ public class ModDataAttachments
     //fish caught counter
     public static List<FishCaughtCounter> getFishCaught(Player player)
     {
-        return List.of(new FishCaughtCounter(FishProperties.DEFAULT, 0, 0, 0));
+        return Starcatcher.FPsCaught.getOrDefault(player, List.of(new FishCaughtCounter(FishProperties.DEFAULT,
+                0, 0, 0)));
     }
 
     public static void setFishCaught(Player player, List<FishCaughtCounter> list)
     {
+        Starcatcher.FPsCaught.put(player, list);
     }
 
     //trophies caught
     public static List<TrophyProperties> getTrophiesCaught(Player player)
     {
-        return List.of(TrophyProperties.DEFAULT);
+        return Starcatcher.TPsCaught.getOrDefault(player, List.of(TrophyProperties.DEFAULT));
     }
 
     public static void setTrophiesCaught(Player player, List<TrophyProperties> list)
     {
+        Starcatcher.TPsCaught.put(player, list);
     }
 
     //fish notifications
     public static List<FishProperties> getFishesNotification(Player player)
     {
-        return List.of(FishProperties.DEFAULT);
+        return Starcatcher.FPsNotifications.getOrDefault(player, List.of(FishProperties.DEFAULT));
     }
 
     public static void setFishesNotification(Player player, List<FishProperties> list)
     {
+        Starcatcher.FPsNotifications.put(player, list);
     }
 
 }

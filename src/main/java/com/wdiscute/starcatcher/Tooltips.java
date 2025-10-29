@@ -50,7 +50,6 @@ public class Tooltips
 
         if (I18n.exists(baseTooltip + ".0"))
         {
-            //todo this probably doesnt work on screens
             if (Screen.hasShiftDown())
             {
                 tooltipComponents.add(Component.translatable("tooltip.libtooltips.generic.shift_down"));

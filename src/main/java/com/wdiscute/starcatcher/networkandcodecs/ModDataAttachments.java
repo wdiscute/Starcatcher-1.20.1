@@ -54,7 +54,7 @@ public class ModDataAttachments
     //fishing uuid
     public static String getFishingUUID(Player player)
     {
-        return "0";
+        return "";
     }
 
     public static void setFishingUUID(Player player, String s)

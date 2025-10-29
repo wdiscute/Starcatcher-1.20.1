@@ -32,10 +32,6 @@ public class StarcatcherFishingRod extends Item implements MenuProvider
         );
     }
 
-
-
-
-
     //comment - kuko010
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand)
     {
@@ -71,7 +67,6 @@ public class StarcatcherFishingRod extends Item implements MenuProvider
         }
         else
         {
-
             List<Entity> entities = level.getEntities(null, new AABB(-25, -65, -25, 25, 65, 25).move(player.position()));
 
             for (Entity entity : entities)

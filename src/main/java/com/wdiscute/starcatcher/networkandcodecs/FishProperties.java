@@ -6,6 +6,7 @@ import com.wdiscute.starcatcher.ModItems;
 import com.wdiscute.starcatcher.Starcatcher;
 import com.wdiscute.starcatcher.StarcatcherTags;
 import com.wdiscute.starcatcher.bob.FishingBobEntity;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.RegistryAccess;
@@ -19,6 +20,7 @@ import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
@@ -91,7 +93,7 @@ public record FishProperties(
 
 
     public static final FishProperties DEFAULT = new FishProperties(
-            ModItems.MISSINGNO.getHolder().get(),
+            Holder.direct(Items.DIRT),
             5,
             "",
             Rarity.COMMON,

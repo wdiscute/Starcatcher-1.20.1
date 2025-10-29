@@ -1,8 +1,11 @@
 package com.wdiscute.starcatcher.networkandcodecs;
 
+import com.wdiscute.starcatcher.Starcatcher;
+import com.wdiscute.starcatcher.bob.FishingBobEntity;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.List;
+import java.util.Map;
 
 public class ModDataAttachments
 {
@@ -54,11 +57,12 @@ public class ModDataAttachments
     //fishing uuid
     public static String getFishingUUID(Player player)
     {
-        return "";
+        return Starcatcher.fishingPlayersMap.getOrDefault(player, "");
     }
 
     public static void setFishingUUID(Player player, String s)
     {
+        Starcatcher.fishingPlayersMap.put(player, s);
     }
 
     //fish caught counter

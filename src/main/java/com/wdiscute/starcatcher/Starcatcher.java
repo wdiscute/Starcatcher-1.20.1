@@ -1,6 +1,7 @@
 package com.wdiscute.starcatcher;
 
 import com.mojang.logging.LogUtils;
+import com.wdiscute.starcatcher.bob.FishingBobEntity;
 import com.wdiscute.starcatcher.bob.FishingBobModel;
 import com.wdiscute.starcatcher.bob.FishingBobRenderer;
 import com.wdiscute.starcatcher.fishentity.FishEntity;
@@ -18,6 +19,8 @@ import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.EntityRenderersEvent;
@@ -32,6 +35,10 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DataPackRegistryEvent;
 import org.slf4j.Logger;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(Starcatcher.MOD_ID)
@@ -51,6 +58,8 @@ public class Starcatcher
     {
         return ResourceLocation.fromNamespaceAndPath(Starcatcher.MOD_ID, s);
     }
+
+    public static Map<Player, String> fishingPlayersMap = new HashMap<>();
 
     @OnlyIn(Dist.CLIENT)
     public static void fishCaughtToast(FishProperties fp)
@@ -76,10 +85,9 @@ public class Starcatcher
     }
 
 
-    @Mod.EventBusSubscriber(modid = MOD_ID)
+    @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
     public static class ModEvents
     {
-
         @SubscribeEvent
         public static void addRegistry(DataPackRegistryEvent.NewRegistry event)
         {
@@ -129,7 +137,7 @@ public class Starcatcher
     }
 
     @OnlyIn(Dist.CLIENT)
-    @Mod.EventBusSubscriber(modid = MOD_ID, value = Dist.CLIENT)
+    @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
     public static class ModClientEvents
     {
 
@@ -244,6 +252,7 @@ public class Starcatcher
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event)
         {
+            System.out.println("test123");
             EntityRenderers.register(ModEntities.FISHING_BOB.get(), FishingBobRenderer::new);
             EntityRenderers.register(ModEntities.BOTTLE.get(), ThrownItemRenderer::new);
             EntityRenderers.register(ModEntities.FISH.get(), FishRenderer::new);

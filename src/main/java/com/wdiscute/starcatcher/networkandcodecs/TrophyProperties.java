@@ -3,8 +3,10 @@ package com.wdiscute.starcatcher.networkandcodecs;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.wdiscute.starcatcher.ModItems;
+import net.minecraft.core.Holder;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.item.Items;
 
 import java.util.List;
 
@@ -24,7 +26,7 @@ public record TrophyProperties
 {
 
     public static final TrophyProperties DEFAULT = new TrophyProperties(
-            FishProperties.DEFAULT.withFish(ModItems.MISSINGNO.getHolder().get()),
+            FishProperties.DEFAULT.withFish(Holder.direct(Items.DIRT)),
             TrophyType.EXTRA,
             "Missingno Trophy",
             RarityProgress.DEFAULT,

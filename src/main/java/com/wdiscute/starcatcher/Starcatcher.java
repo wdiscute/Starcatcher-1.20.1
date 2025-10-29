@@ -248,7 +248,6 @@ public class Starcatcher
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event)
         {
-            System.out.println("test123");
             EntityRenderers.register(ModEntities.FISHING_BOB.get(), FishingBobRenderer::new);
             EntityRenderers.register(ModEntities.BOTTLE.get(), ThrownItemRenderer::new);
             EntityRenderers.register(ModEntities.FISH.get(), FishRenderer::new);

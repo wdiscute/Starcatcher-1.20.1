@@ -31,7 +31,6 @@ public class FishCaughtToast implements Toast
         this.is = new ItemStack(fp.fish());
         this.title = Component.translatable("gui.starcatcher.toast.fish_caught");
         this.description =  is.getHoverName().getString();
-        System.out.println("description " + description);
     }
 
     public Visibility render(GuiGraphics guiGraphics, ToastComponent toastComponent, long timeSinceLastVisible)

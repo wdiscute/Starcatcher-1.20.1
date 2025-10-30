@@ -26,7 +26,7 @@ public record TrophyProperties
 {
 
     public static final TrophyProperties DEFAULT = new TrophyProperties(
-            FishProperties.DEFAULT.withFish(Holder.direct(Items.DIRT)),
+            FishProperties.DEFAULT.withFish(Items.DIRT),
             TrophyType.EXTRA,
             "Missingno Trophy",
             RarityProgress.DEFAULT,

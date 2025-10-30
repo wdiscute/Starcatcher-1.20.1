@@ -961,7 +961,7 @@ public class FishingGuideScreen extends Screen
             {
                 if (fp.customName().isEmpty())
                     //todo fix this components.add(Component.translatable("item." + fp.fish().getRegisteredName().replace(":", ".")));
-                    components.add(Component.translatable("item." + fp.fish().get().getDescriptionId().replace(":", ".")));
+                    components.add(Component.translatable(fp.fish().getDescriptionId()));
                 else
                     components.add(Component.translatable("item.starcatcher." + fp.customName()));
 
@@ -1014,7 +1014,7 @@ public class FishingGuideScreen extends Screen
             //render fish name
             MutableComponent compName;
             if (fp.customName().isEmpty())
-                compName = Component.translatable(fp.fish().value().getDescriptionId());
+                compName = Component.translatable(fp.fish().getDescriptionId());
             else
                 compName = Component.translatable("item.starcatcher." + fp.customName());
 

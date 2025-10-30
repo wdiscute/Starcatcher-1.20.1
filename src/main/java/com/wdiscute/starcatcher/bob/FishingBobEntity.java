@@ -168,7 +168,7 @@ public class FishingBobEntity extends Projectile
             )
             {
 
-                ItemStack is = new ItemStack(BuiltInRegistries.ITEM.get(tp.fp().fish().unwrapKey().get()));
+                ItemStack is = new ItemStack(tp.fp().fish());
                 ModDataComponents.setTrophyProperties(is, tp);
                 //is.set(ModDataComponents.TROPHY, tp);
                 if (!tp.customName().isEmpty())

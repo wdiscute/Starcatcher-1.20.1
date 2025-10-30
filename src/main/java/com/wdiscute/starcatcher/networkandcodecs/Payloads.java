@@ -15,6 +15,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -29,6 +30,7 @@ import org.joml.Math;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Supplier;
 
 
@@ -52,6 +54,13 @@ public class Payloads
 
     public static void register()
     {
+
+        CHANNEL.registerMessage(
+                id(), FishingBobUUIDPayload.class,
+                FishingBobUUIDPayload::encode,
+                FishingBobUUIDPayload::decode,
+                FishingBobUUIDPayload::handle,
+                Optional.of(NetworkDirection.PLAY_TO_CLIENT));
 
         CHANNEL.registerMessage(
                 id(), FishesCaughtPayload.class,
@@ -97,6 +106,51 @@ public class Payloads
 
     }
 
+
+    //send fishing uuid
+    public static class FishingBobUUIDPayload
+    {
+        private final String playerUUID;
+        private final String bobUUID;
+
+        public FishingBobUUIDPayload(Player player, String uuid)
+        {
+            this.playerUUID = player.getStringUUID();
+            this.bobUUID = uuid;
+        }
+
+        public FishingBobUUIDPayload(String player, String uuid)
+        {
+            this.playerUUID = player;
+            this.bobUUID = uuid;
+        }
+
+        public static void encode(FishingBobUUIDPayload fishesCaughtPayload, FriendlyByteBuf buf)
+        {
+            buf.writeUtf(fishesCaughtPayload.playerUUID);
+            buf.writeUtf(fishesCaughtPayload.bobUUID);
+        }
+
+        public static FishingBobUUIDPayload decode(FriendlyByteBuf buf)
+        {
+            String playerUUID = buf.readUtf();
+            String bobUUID = buf.readUtf();
+
+            return new FishingBobUUIDPayload(playerUUID, bobUUID);
+        }
+
+        public static void handle(FishingBobUUIDPayload fishingBobUUIDPayload, Supplier<NetworkEvent.Context> context)
+        {
+            context.get().enqueueWork(() ->
+            {
+                Player player = Minecraft.getInstance().level.getPlayerByUUID(UUID.fromString(fishingBobUUIDPayload.playerUUID));
+                if(player != null)
+                    DataAttachments.get(player).setFishing(fishingBobUUIDPayload.bobUUID);
+            });
+            context.get().setPacketHandled(true);
+        }
+    }
+
     //send fishes caught to client
     public static class FishesCaughtPayload
     {
@@ -123,10 +177,18 @@ public class Payloads
         {
             context.get().enqueueWork(() ->
             {
-                DataAttachments.get(Minecraft.getInstance().player).setFishesCaught(fishesCaughtPayload.fishesCaught);
+                client(fishesCaughtPayload.fishesCaught);
             });
             context.get().setPacketHandled(true);
         }
+
+
+        @OnlyIn(Dist.CLIENT)
+        private static void client(List<FishCaughtCounter> fishesCaught)
+        {
+            DataAttachments.get(Minecraft.getInstance().player).setFishesCaught(fishesCaught);
+        }
+
     }
 
     //send fishes caught to client
@@ -155,10 +217,17 @@ public class Payloads
         {
             context.get().enqueueWork(() ->
             {
-                DataAttachments.get(Minecraft.getInstance().player).setTrophiesCaught(trophiesCaughtPayload.tps);
+                client(trophiesCaughtPayload.tps);
             });
             context.get().setPacketHandled(true);
         }
+
+        @OnlyIn(Dist.CLIENT)
+        private static void client(List<TrophyProperties> tps)
+        {
+            DataAttachments.get(Minecraft.getInstance().player).setTrophiesCaught(tps);
+        }
+
     }
 
     //send fishes caught to client
@@ -187,10 +256,17 @@ public class Payloads
         {
             context.get().enqueueWork(() ->
             {
-                DataAttachments.get(Minecraft.getInstance().player).setFishNotifications(fishesNotificationPayload.fps);
+                client(fishesNotificationPayload.fps);
             });
             context.get().setPacketHandled(true);
         }
+
+        @OnlyIn(Dist.CLIENT)
+        private static void client(List<FishProperties> fps)
+        {
+            DataAttachments.get(Minecraft.getInstance().player).setFishNotifications(fps);
+        }
+
     }
 
 

@@ -21,6 +21,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
@@ -32,14 +33,17 @@ import net.minecraftforge.common.capabilities.*;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.registries.DataPackRegistryEvent;
 import org.slf4j.Logger;
 
+import javax.xml.crypto.Data;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -124,6 +128,28 @@ public class Starcatcher
 
             event.addCapability(Starcatcher.rl("fish"), provider);
         }
+
+        @SubscribeEvent
+        public static void playerLogInEvent(PlayerEvent.PlayerLoggedInEvent event)
+        {
+            Player player = event.getEntity();
+
+            if(player instanceof ServerPlayer sp)
+            {
+                DataAttachmentCapability playerCap = DataAttachments.get(player);
+
+                Payloads.CHANNEL.send(PacketDistributor.PLAYER.with(() -> sp),
+                        new Payloads.FishesCaughtPayload(playerCap.fishesCaught()));
+
+                Payloads.CHANNEL.send(PacketDistributor.PLAYER.with(() -> sp),
+                        new Payloads.TrophiesCaughtPayload(playerCap.trophiesCaught()));
+
+                Payloads.CHANNEL.send(PacketDistributor.PLAYER.with(() -> sp),
+                        new Payloads.FishesNotificationPayload(playerCap.fishNotifications()));
+            }
+
+        }
+
 
     }
 

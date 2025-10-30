@@ -1,7 +1,6 @@
 package com.wdiscute.starcatcher.networkandcodecs;
 
 import com.mojang.logging.LogUtils;
-import com.wdiscute.starcatcher.Starcatcher;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
@@ -45,6 +44,14 @@ public class DataAttachments implements DataAttachmentCapability, INBTSerializab
     public void setFishing(String s)
     {
         this.fishing = s;
+
+        if(this.player instanceof ServerPlayer sp)
+        {
+            Payloads.CHANNEL.send(
+                    PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> sp),
+                    new Payloads.FishingBobUUIDPayload(player, s)
+            );
+        }
     }
 
     @Override

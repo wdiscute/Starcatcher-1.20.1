@@ -15,7 +15,6 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -53,6 +52,28 @@ public class Payloads
 
     public static void register()
     {
+
+        CHANNEL.registerMessage(
+                id(), FishesCaughtPayload.class,
+                FishesCaughtPayload::encode,
+                FishesCaughtPayload::decode,
+                FishesCaughtPayload::handle,
+                Optional.of(NetworkDirection.PLAY_TO_CLIENT));
+
+        CHANNEL.registerMessage(
+                id(), TrophiesCaughtPayload.class,
+                TrophiesCaughtPayload::encode,
+                TrophiesCaughtPayload::decode,
+                TrophiesCaughtPayload::handle,
+                Optional.of(NetworkDirection.PLAY_TO_CLIENT));
+
+        CHANNEL.registerMessage(
+                id(), FishesNotificationPayload.class,
+                FishesNotificationPayload::encode,
+                FishesNotificationPayload::decode,
+                FishesNotificationPayload::handle,
+                Optional.of(NetworkDirection.PLAY_TO_CLIENT));
+
         CHANNEL.registerMessage(
                 id(), FishingPayload.class,
                 FishingPayload::encode,
@@ -74,7 +95,102 @@ public class Payloads
                 FishCaughtPayload::handle,
                 Optional.of(NetworkDirection.PLAY_TO_CLIENT));
 
+    }
 
+    //send fishes caught to client
+    public static class FishesCaughtPayload
+    {
+        private final List<FishCaughtCounter> fishesCaught;
+
+        public FishesCaughtPayload(List<FishCaughtCounter> fishCaught)
+        {
+            this.fishesCaught = fishCaught;
+        }
+
+        public static void encode(FishesCaughtPayload fishesCaughtPayload, FriendlyByteBuf buf)
+        {
+            buf.writeJsonWithCodec(FishCaughtCounter.LIST_CODEC, fishesCaughtPayload.fishesCaught);
+        }
+
+        public static FishesCaughtPayload decode(FriendlyByteBuf buf)
+        {
+            List<FishCaughtCounter> fishesCaught = buf.readJsonWithCodec(FishCaughtCounter.LIST_CODEC);
+
+            return new FishesCaughtPayload(fishesCaught);
+        }
+
+        public static void handle(FishesCaughtPayload fishesCaughtPayload, Supplier<NetworkEvent.Context> context)
+        {
+            context.get().enqueueWork(() ->
+            {
+                DataAttachments.get(Minecraft.getInstance().player).setFishesCaught(fishesCaughtPayload.fishesCaught);
+            });
+            context.get().setPacketHandled(true);
+        }
+    }
+
+    //send fishes caught to client
+    public static class TrophiesCaughtPayload
+    {
+        private final List<TrophyProperties> tps;
+
+        public TrophiesCaughtPayload(List<TrophyProperties> tpsCaught)
+        {
+            this.tps = tpsCaught;
+        }
+
+        public static void encode(TrophiesCaughtPayload trophiesCaughtPayload, FriendlyByteBuf buf)
+        {
+            buf.writeJsonWithCodec(TrophyProperties.LIST_CODEC, trophiesCaughtPayload.tps);
+        }
+
+        public static TrophiesCaughtPayload decode(FriendlyByteBuf buf)
+        {
+            List<TrophyProperties> tps = buf.readJsonWithCodec(TrophyProperties.LIST_CODEC);
+
+            return new TrophiesCaughtPayload(tps);
+        }
+
+        public static void handle(TrophiesCaughtPayload trophiesCaughtPayload, Supplier<NetworkEvent.Context> context)
+        {
+            context.get().enqueueWork(() ->
+            {
+                DataAttachments.get(Minecraft.getInstance().player).setTrophiesCaught(trophiesCaughtPayload.tps);
+            });
+            context.get().setPacketHandled(true);
+        }
+    }
+
+    //send fishes caught to client
+    public static class FishesNotificationPayload
+    {
+        private final List<FishProperties> fps;
+
+        public FishesNotificationPayload(List<FishProperties> tpsCaught)
+        {
+            this.fps = tpsCaught;
+        }
+
+        public static void encode(FishesNotificationPayload fishesNotificationPayload, FriendlyByteBuf buf)
+        {
+            buf.writeJsonWithCodec(FishProperties.LIST_CODEC, fishesNotificationPayload.fps);
+        }
+
+        public static FishesNotificationPayload decode(FriendlyByteBuf buf)
+        {
+            List<FishProperties> tps = buf.readJsonWithCodec(FishProperties.LIST_CODEC);
+
+            return new FishesNotificationPayload(tps);
+        }
+
+        public static void handle(FishesNotificationPayload fishesNotificationPayload, Supplier<NetworkEvent.Context> context)
+        {
+            context.get().enqueueWork(() ->
+            {
+                DataAttachments.get(Minecraft.getInstance().player).setFishNotifications(fishesNotificationPayload.fps);
+            });
+            context.get().setPacketHandled(true);
+        }
     }
 
 
@@ -168,22 +284,13 @@ public class Payloads
 
                 for (Entity entity : entities)
                 {
-                    if (entity.getUUID().toString().equals(ModDataAttachments.getFishingUUID(player)))
+                    if (entity.getUUID().toString().equals(DataAttachments.get(player).fishing()))
                     {
                         if (entity instanceof FishingBobEntity fbe)
                         {
                             if (data.tickCount != -1)
                             {
                                 FishProperties fp = fbe.fpToFish;
-
-                                //MAKE THIS DATA DRIVEN
-//                        if (fbe.stack.is(ModItems.THUNDERCHARGED_EEL))
-//                        {
-//                            LightningBolt strike = new LightningBolt(EntityType.LIGHTNING_BOLT, level);
-//                            strike.setPos(fbe.position());
-//                            strike.setVisualOnly(true);
-//                            level.addFreshEntity(strike);
-//                        }
 
                                 //create itemStacks
                                 ItemStack is = new ItemStack(fbe.fpToFish.fish());
@@ -226,13 +333,11 @@ public class Payloads
                                             net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> player),
                                             new Payloads.FishCaughtPayload(fp)
                                     );
-                                //PacketDistributor.sendToPlayer(sp, new Payloads.FishCaughtPayload(fp));
 
                                 //award fish counter
-                                List<FishProperties> list = new ArrayList<>(ModDataAttachments.getFishesNotification(player));
+                                List<FishProperties> list = new ArrayList<>(DataAttachments.get(player).fishNotifications());
                                 list.add(fbe.fpToFish);
-                                ModDataAttachments.setFishesNotification(player, list);
-                                //player.setData(ModDataAttachments.FISHES_NOTIFICATION, list);
+                                DataAttachments.get(player).setFishNotifications(list);
 
                                 //award exp
                                 int exp = 4;
@@ -262,7 +367,7 @@ public class Payloads
 
                 }
 
-                ModDataAttachments.setFishingUUID(player, "");
+                DataAttachments.get(player).setFishing("");
 
                 context.get().setPacketHandled(true);
             });
@@ -270,7 +375,7 @@ public class Payloads
 
     }
 
-    //send fishing start to client
+    //send fish caught toast
     public static class FishCaughtPayload
     {
         private final FishProperties fp;

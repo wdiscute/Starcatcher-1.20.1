@@ -15,15 +15,22 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
+import net.minecraftforge.common.capabilities.*;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -72,18 +79,53 @@ public class Starcatcher
 
         ModCreativeModeTabs.register(eventBus);
         ModItems.register(eventBus);
-        //ModDataComponents.register(eventBus);
         ModSounds.register(eventBus);
         ModEntities.register(eventBus);
         ModParticles.register(eventBus);
         ModMenuTypes.register(eventBus);
-        //ModDataAttachments.register(eventBus);
 
         Payloads.register();
 
         //modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }
 
+    @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+    public static class IHateForge
+    {
+        @SubscribeEvent
+        public static void attachEvent(AttachCapabilitiesEvent<Entity> event)
+        {
+            if (!(event.getObject() instanceof Player player)) return;
+
+            DataAttachments modCapabilities = new DataAttachments(player);
+            LazyOptional<DataAttachmentCapability> optionalStorage = LazyOptional.of(() -> modCapabilities);
+
+            ICapabilityProvider provider = new ICapabilitySerializable<CompoundTag>() {
+                @Override
+                public CompoundTag serializeNBT()
+                {
+                    return modCapabilities.serializeNBT();
+                }
+
+                @Override
+                public void deserializeNBT(CompoundTag tag)
+                {
+                    modCapabilities.deserializeNBT(tag);
+                }
+
+                @Override
+                public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction direction) {
+                    if (cap == DataAttachmentCapability.PLAYER_DATA) {
+                        return optionalStorage.cast();
+                    }
+                    return LazyOptional.empty();
+                }
+            };
+
+            event.addCapability(Starcatcher.rl("fish"), provider);
+        }
+
+    }
 
     @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
     public static class ModEvents

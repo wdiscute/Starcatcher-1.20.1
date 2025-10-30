@@ -30,8 +30,6 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -125,8 +123,7 @@ public class FishingGuideScreen extends Screen
     List<FishProperties> fishInArea = new ArrayList<>();
     List<FishCaughtCounter> fishCaughtCounterList = new ArrayList<>();
 
-    //TrophyProperties.RarityProgress all = new TrophyProperties.RarityProgress(0, Minecraft.getInstance().player.getData(ModDataAttachments.FISHES_CAUGHT).size() - 1); //-1 to remove the default
-    TrophyProperties.RarityProgress all = new TrophyProperties.RarityProgress(0, ModDataAttachments.getFishCaught(player).size() - 1); //-1 to remove the default
+    TrophyProperties.RarityProgress all = new TrophyProperties.RarityProgress(0, DataAttachments.get(Minecraft.getInstance().player).fishesCaught().size() - 1); //-1 to remove the default
     TrophyProperties.RarityProgress common = new TrophyProperties.RarityProgress(0, -1);
     TrophyProperties.RarityProgress uncommon = TrophyProperties.RarityProgress.DEFAULT;
     TrophyProperties.RarityProgress rare = TrophyProperties.RarityProgress.DEFAULT;
@@ -160,23 +157,21 @@ public class FishingGuideScreen extends Screen
         {
             if (tp.trophyType() == TrophyProperties.TrophyType.SECRET
                     //&& player.getData(ModDataAttachments.TROPHIES_CAUGHT).contains(tp)) secretsTps.add(tp);
-                    && ModDataAttachments.getTrophiesCaught(player).contains(tp)) secretsTps.add(tp);
+                    && DataAttachments.get(player).trophiesCaught().contains(tp)) secretsTps.add(tp);
         }
 
         fishInArea = FishProperties.getFpsWithGuideEntryForArea(player);
-        //fishCaughtCounterList = player.getData(ModDataAttachments.FISHES_CAUGHT);
-        fishCaughtCounterList = ModDataAttachments.getFishCaught(player);
+        fishCaughtCounterList = DataAttachments.get(player).fishesCaught();
 
         //-1 on the common to account for the default "fish" unfortunately, theres probably a way to fix this
-        //all = new TrophyProperties.RarityProgress(0, player.getData(ModDataAttachments.FISHES_CAUGHT).size() - 1); //-1 to remove the default
-        all = new TrophyProperties.RarityProgress(0, ModDataAttachments.getFishCaught(player).size() - 1); //-1 to remove the default
+        all = new TrophyProperties.RarityProgress(0, DataAttachments.get(player).fishesCaught().size() - 1); //-1 to remove the default
         common = new TrophyProperties.RarityProgress(0, -1);
         uncommon = TrophyProperties.RarityProgress.DEFAULT;
         rare = TrophyProperties.RarityProgress.DEFAULT;
         epic = TrophyProperties.RarityProgress.DEFAULT;
         legendary = TrophyProperties.RarityProgress.DEFAULT;
 
-        for (FishCaughtCounter fcc : ModDataAttachments.getFishCaught(player))
+        for (FishCaughtCounter fcc : DataAttachments.get(player).fishesCaught())
         {
             all = new TrophyProperties.RarityProgress(all.total() + fcc.count(), all.unique());
 
@@ -541,7 +536,7 @@ public class FishingGuideScreen extends Screen
             ItemStack is;
             boolean isMouseOnTop = mouseX > xrender - 10 && mouseX < xrender + 10 && mouseY > y - 2 && mouseY < y + 18;
 
-            if (ModDataAttachments.getTrophiesCaught(player).contains(tp))
+            if (DataAttachments.get(player).trophiesCaught().contains(tp))
             //if (player.getData(ModDataAttachments.TROPHIES_CAUGHT).contains(tp))
             {
                 is = new ItemStack(tp.fp().fish());
@@ -885,7 +880,7 @@ public class FishingGuideScreen extends Screen
 
     private void renderFishIndex(GuiGraphics guiGraphics, int xOffset, int yOffset, int mouseX, int mouseY, FishProperties fp)
     {
-        List<FishCaughtCounter> fishCounterList = ModDataAttachments.getFishCaught(player);
+        List<FishCaughtCounter> fishCounterList = DataAttachments.get(player).fishesCaught();
         //List<FishCaughtCounter> fishCounterList = player.getData(ModDataAttachments.FISHES_CAUGHT);
         ItemStack is = new ItemStack(fp.fish());
 
@@ -944,7 +939,7 @@ public class FishingGuideScreen extends Screen
             renderItem(new ItemStack(ModItems.MISSINGNO.get()), xOffset, yOffset, 1);
 
         //render fish notification icon
-        for (FishProperties fpNotif : ModDataAttachments.getFishesNotification(player))
+        for (FishProperties fpNotif : DataAttachments.get(player).fishNotifications())
         //for (FishProperties fpNotif : player.getData(ModDataAttachments.FISHES_NOTIFICATION))
         {
             if (fp.equals(fpNotif))

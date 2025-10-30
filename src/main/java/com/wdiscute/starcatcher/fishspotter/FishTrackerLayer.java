@@ -3,9 +3,9 @@ package com.wdiscute.starcatcher.fishspotter;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.wdiscute.starcatcher.ModItems;
 import com.wdiscute.starcatcher.Starcatcher;
+import com.wdiscute.starcatcher.networkandcodecs.DataAttachments;
 import com.wdiscute.starcatcher.networkandcodecs.FishCaughtCounter;
 import com.wdiscute.starcatcher.networkandcodecs.FishProperties;
-import com.wdiscute.starcatcher.networkandcodecs.ModDataAttachments;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -47,7 +47,7 @@ public class FishTrackerLayer implements IGuiOverlay
     {
         fpsInArea = FishProperties.getFpsWithGuideEntryForArea(player);
         fishesCaught = new ArrayList<>();
-        for (FishCaughtCounter fishes : ModDataAttachments.getFishCaught(player)) fishesCaught.add(fishes.fp());
+        for (FishCaughtCounter fishes : DataAttachments.get(player).fishesCaught()) fishesCaught.add(fishes.fp());
     }
 
 

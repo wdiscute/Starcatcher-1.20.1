@@ -43,7 +43,7 @@ public record FishCaughtCounter(
     public static boolean AwardFishCaughtCounter(FishProperties fpCaught, Player player, int ticks)
     {
 
-        List<FishCaughtCounter> listFishCaughtCounter = ModDataAttachments.getFishCaught(player);
+        List<FishCaughtCounter> listFishCaughtCounter = DataAttachments.get(player).fishesCaught();
         //List<FishCaughtCounter> listFishCaughtCounter = player.getData(ModDataAttachments.FISHES_CAUGHT);
         List<FishCaughtCounter> newlist = new ArrayList<>();
 
@@ -69,7 +69,7 @@ public record FishCaughtCounter(
 
         if (newFish) newlist.add(new FishCaughtCounter(fpCaught, 1, ticks, ticks));
 
-        ModDataAttachments.setFishCaught(player, newlist);
+        DataAttachments.get(player).setFishesCaught(newlist);
         //player.setData(ModDataAttachments.FISHES_CAUGHT, newlist);
         return newFish;
     }

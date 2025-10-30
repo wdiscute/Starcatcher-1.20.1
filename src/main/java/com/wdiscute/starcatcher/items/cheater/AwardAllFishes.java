@@ -1,9 +1,11 @@
 package com.wdiscute.starcatcher.items.cheater;
 
 import com.wdiscute.starcatcher.Starcatcher;
+import com.wdiscute.starcatcher.networkandcodecs.DataAttachments;
 import com.wdiscute.starcatcher.networkandcodecs.FishCaughtCounter;
 import com.wdiscute.starcatcher.networkandcodecs.FishProperties;
-import com.wdiscute.starcatcher.networkandcodecs.ModDataAttachments;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
@@ -27,6 +29,8 @@ public class AwardAllFishes extends Item
         if(!player.isCreative())
             return InteractionResultHolder.pass(player.getItemInHand(usedHand));
 
+        if(!(level instanceof ServerLevel)) return InteractionResultHolder.success(player.getItemInHand(usedHand));
+
         //sets all fps on fishes caught to 1
         List<FishCaughtCounter> fishCounter = new ArrayList<>();
         List<FishProperties> fishes = new ArrayList<>();
@@ -36,15 +40,14 @@ public class AwardAllFishes extends Item
             fishCounter.add(new FishCaughtCounter(fp, 1, Integer.MAX_VALUE, 99999));
         }
 
-        ModDataAttachments.setFishCaught(player, fishCounter);
-        //player.setData(ModDataAttachments.FISHES_CAUGHT, fishCounater);
+        DataAttachments.get(player).setFishesCaught(fishCounter);
 
         for (FishProperties fp : level.registryAccess().registryOrThrow(Starcatcher.FISH_REGISTRY))
         {
             fishes.add(fp);
         }
 
-        ModDataAttachments.setFishesNotification(player, fishes);
+        DataAttachments.get(player).setFishNotifications(fishes);
         //player.setData(ModDataAttachments.FISHES_NOTIFICATION, fishes);
 
         return InteractionResultHolder.success(player.getItemInHand(usedHand));

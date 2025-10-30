@@ -2,7 +2,7 @@ package com.wdiscute.starcatcher.rod;
 
 import com.wdiscute.starcatcher.ModItems;
 import com.wdiscute.starcatcher.bob.FishingBobEntity;
-import com.wdiscute.starcatcher.networkandcodecs.ModDataAttachments;
+import com.wdiscute.starcatcher.networkandcodecs.DataAttachments;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -20,6 +20,7 @@ import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 
+import javax.xml.crypto.Data;
 import java.util.List;
 
 public class StarcatcherFishingRod extends Item implements MenuProvider
@@ -44,25 +45,20 @@ public class StarcatcherFishingRod extends Item implements MenuProvider
             return InteractionResultHolder.success(player.getItemInHand(hand));
         }
 
+        var wad = DataAttachments.get(player);
+
         if (level.isClientSide) return InteractionResultHolder.success(player.getItemInHand(hand));
 
-
-        if (ModDataAttachments.getFishingUUID(player).isEmpty())
-        //if (player.getData(ModDataAttachments.FISHING.get()).isEmpty())
+        if (DataAttachments.get(player).fishing().isEmpty())
         {
             level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.FISHING_BOBBER_THROW, SoundSource.NEUTRAL, 0.5F, 0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F));
 
             if (level instanceof ServerLevel)
             {
-                //TODO ADD CUSTOM STAT FOR NUMBER OF FISHES CAUGHT TOTAL ON STAT SCREEN
-
                 FishingBobEntity entity = new FishingBobEntity(level, player, player.getItemInHand(hand));
                 level.addFreshEntity(entity);
 
-                ModDataAttachments.setFishingUUID(player, entity.getStringUUID());
-                //player.setData(ModDataAttachments.FISHING.get(), entity.getStringUUID());
-                //removed and used variable in entity instead
-                //entity.setData(ModDataAttachments.BOBBER.get(), player.getItemInHand(hand).get(ModDataComponents.BOBBER));
+                DataAttachments.get(player).setFishing(entity.getStringUUID());
             }
         }
         else
@@ -72,14 +68,12 @@ public class StarcatcherFishingRod extends Item implements MenuProvider
             for (Entity entity : entities)
             {
 
-                if (entity.getUUID().toString().equals(ModDataAttachments.getFishingUUID(player)))
-                //if (entity.getUUID().toString().equals(player.getData(ModDataAttachments.FISHING.get())))
+                if (entity.getUUID().toString().equals(DataAttachments.get(player).fishing()))
                 {
                     if (entity instanceof FishingBobEntity fbe && !fbe.checkBiting())
                     {
                         fbe.kill();
-                        ModDataAttachments.setFishingUUID(player, "");
-                        //player.setData(ModDataAttachments.FISHING.get(), "");
+                        DataAttachments.get(player).setFishing("");
                     }
                 }
             }

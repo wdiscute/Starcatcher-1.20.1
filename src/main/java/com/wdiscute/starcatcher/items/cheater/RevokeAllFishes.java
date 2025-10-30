@@ -2,7 +2,8 @@ package com.wdiscute.starcatcher.items.cheater;
 
 import com.wdiscute.starcatcher.networkandcodecs.FishCaughtCounter;
 import com.wdiscute.starcatcher.networkandcodecs.FishProperties;
-import com.wdiscute.starcatcher.networkandcodecs.ModDataAttachments;
+import com.wdiscute.starcatcher.networkandcodecs.DataAttachments;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
@@ -22,11 +23,11 @@ public class RevokeAllFishes extends Item
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand)
     {
+        if(!(level instanceof ServerLevel)) return InteractionResultHolder.success(player.getItemInHand(usedHand));
+
         //reset fishes caught
-        ModDataAttachments.setFishCaught(player, List.of(FishCaughtCounter.DEFAULT));
-        ModDataAttachments.setFishesNotification(player, List.of(FishProperties.DEFAULT));
-        //player.removeData(ModDataAttachments.FISHES_CAUGHT);
-        //player.removeData(ModDataAttachments.FISHES_NOTIFICATION);
+        DataAttachments.get(player).setFishesCaught(List.of(FishCaughtCounter.DEFAULT));
+        DataAttachments.get(player).setFishNotifications(List.of(FishProperties.DEFAULT));
         return InteractionResultHolder.success(player.getItemInHand(usedHand));
     }
 

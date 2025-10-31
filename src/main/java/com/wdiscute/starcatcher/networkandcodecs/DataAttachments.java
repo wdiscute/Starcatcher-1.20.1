@@ -1,10 +1,7 @@
 package com.wdiscute.starcatcher.networkandcodecs;
 
 import com.mojang.logging.LogUtils;
-import com.wdiscute.starcatcher.Starcatcher;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
@@ -12,11 +9,12 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.network.PacketDistributor;
 import org.slf4j.Logger;
 
-import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,11 +65,12 @@ public class DataAttachments implements DataAttachmentCapability, INBTSerializab
         return fishesCaught;
     }
 
+    @OnlyIn(Dist.CLIENT)
     public static void setFishesCaughtClient(List<FishCaughtNetwork> fishCaughtNetworks)
     {
         List<FishCaughtCounter> list = new ArrayList<>();
 
-        LocalPlayer player = Minecraft.getInstance().player;
+        Player player = Minecraft.getInstance().player;
 
         for (FishCaughtNetwork fishCaughtNetwork : fishCaughtNetworks)
         {
@@ -126,11 +125,12 @@ public class DataAttachments implements DataAttachmentCapability, INBTSerializab
         return notifications;
     }
 
+    @OnlyIn(Dist.CLIENT)
     public static void setFishNotificationsClient(List<ResourceLocation> listRLs)
     {
         List<FishProperties> notifications = new ArrayList<>();
 
-        LocalPlayer player = Minecraft.getInstance().player;
+        Player player = Minecraft.getInstance().player;
 
         for (ResourceLocation rl : listRLs)
         {

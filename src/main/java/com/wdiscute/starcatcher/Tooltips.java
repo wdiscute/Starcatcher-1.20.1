@@ -32,8 +32,6 @@ public class Tooltips
     {
         if(event.level.isClientSide)
             Tooltips.hue += 0.001f * 2f;
-
-        System.out.println(hue);
     }
 
     @SubscribeEvent

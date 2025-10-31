@@ -356,7 +356,7 @@ public class FishingBobEntity extends Projectile
         Player player = ((Player) this.getOwner());
         if (player == null || this.shouldStopFishing(player))
         {
-            DataAttachments.get(player).setFishing("");
+            //DataAttachments.get(player).setFishing("");
             this.discard();
         }
 

@@ -12,11 +12,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RenderGuiEvent;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 import java.util.List;
+import java.util.logging.Level;
 
 @OnlyIn(Dist.CLIENT)
 @Mod.EventBusSubscriber(modid = Starcatcher.MOD_ID, value = Dist.CLIENT)
@@ -26,9 +28,12 @@ public class Tooltips
 
     @OnlyIn(Dist.CLIENT)
     @SubscribeEvent
-    public static void renderFrame(RenderGuiEvent.Post event)
+    public static void renderFrame(TickEvent.LevelTickEvent event)
     {
-        Tooltips.hue += 0.001f;
+        if(event.level.isClientSide)
+            Tooltips.hue += 0.001f * 2f;
+
+        System.out.println(hue);
     }
 
     @SubscribeEvent

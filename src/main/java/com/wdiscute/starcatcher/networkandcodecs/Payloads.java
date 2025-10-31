@@ -29,6 +29,7 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 import org.joml.Math;
 
+import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -93,6 +94,13 @@ public class Payloads
                 Optional.of(NetworkDirection.PLAY_TO_CLIENT));
 
         CHANNEL.registerMessage(
+                id(), FishCaughtPayload.class,
+                FishCaughtPayload::encode,
+                FishCaughtPayload::decode,
+                FishCaughtPayload::handle,
+                Optional.of(NetworkDirection.PLAY_TO_CLIENT));
+
+        CHANNEL.registerMessage(
                 id(), FishingCompletedPayload.class,
                 FishingCompletedPayload::encode,
                 FishingCompletedPayload::decode,
@@ -100,16 +108,72 @@ public class Payloads
                 Optional.of(NetworkDirection.PLAY_TO_SERVER));
 
         CHANNEL.registerMessage(
-                id(), FishCaughtPayload.class,
-                FishCaughtPayload::encode,
-                FishCaughtPayload::decode,
-                FishCaughtPayload::handle,
-                Optional.of(NetworkDirection.PLAY_TO_CLIENT));
+                id(), FishesSeenPayload.class,
+                FishesSeenPayload::encode,
+                FishesSeenPayload::decode,
+                FishesSeenPayload::handle,
+                Optional.of(NetworkDirection.PLAY_TO_SERVER));
 
     }
 
 
-    //send fishing uuid
+    //fishes seen
+    public static class FishesSeenPayload
+    {
+        private final List<ResourceLocation> fishesSeenRLs;
+
+        public FishesSeenPayload(List<ResourceLocation> rls)
+        {
+            this.fishesSeenRLs = rls;
+        }
+
+        public static void encode(FishesSeenPayload fishesSeenPayload, FriendlyByteBuf buf)
+        {
+            buf.writeJsonWithCodec(ResourceLocation.CODEC.listOf(), fishesSeenPayload.fishesSeenRLs);
+        }
+
+        public static FishesSeenPayload decode(FriendlyByteBuf buf)
+        {
+            List<ResourceLocation> rls = buf.readJsonWithCodec(ResourceLocation.CODEC.listOf());
+
+            return new FishesSeenPayload(rls);
+        }
+
+        public static void handle(FishesSeenPayload fishesSeenPayload, Supplier<NetworkEvent.Context> context)
+        {
+            context.get().enqueueWork(() ->
+            {
+                //set fishes on server
+                ServerPlayer player = context.get().getSender();
+                List<FishProperties> currentNotifications = DataAttachments.get(player).fishNotifications();
+                Registry<FishProperties> registry = player.level().registryAccess().registryOrThrow(Starcatcher.FISH_REGISTRY);
+
+                List<FishProperties> fishesSeen = new ArrayList<>();
+
+                for (ResourceLocation rl : fishesSeenPayload.fishesSeenRLs)
+                {
+                    FishProperties fp = registry.get(rl);
+
+                    if(fp == null) fp = FishProperties.DEFAULT;
+
+                    fishesSeen.add(fp);
+                }
+
+                List<FishProperties> newList = new ArrayList<>(currentNotifications);
+
+                fishesSeen.stream().forEach(f -> currentNotifications.stream().forEach(n ->
+                {
+                  if(n.equals(f)) newList.remove(n);
+                }));
+
+                DataAttachments.get(player).setFishNotifications(newList);
+
+            });
+            context.get().setPacketHandled(true);
+        }
+    }
+
+    //send fishing uuid to players around player who started fishing
     public static class FishingBobUUIDPayload
     {
         private final String playerUUID;
@@ -146,7 +210,7 @@ public class Payloads
             context.get().enqueueWork(() ->
             {
                 Player player = Minecraft.getInstance().level.getPlayerByUUID(UUID.fromString(fishingBobUUIDPayload.playerUUID));
-                if(player != null)
+                if (player != null)
                     DataAttachments.get(player).setFishing(fishingBobUUIDPayload.bobUUID);
             });
             context.get().setPacketHandled(true);
@@ -166,9 +230,14 @@ public class Payloads
 
             for (FishCaughtCounter fcc : fishCaught)
             {
-                ResourceLocation rl = fishProperties.getKey(fcc.fp());
+                ResourceLocation rl = null;
 
-                if(rl == null) rl = Starcatcher.rl("missingno");
+                for (FishProperties fp : fishProperties)
+                {
+                    if(fp.equals(fcc.fp()))  rl = fishProperties.getKey(fp);
+                }
+
+                if (rl == null) rl = Starcatcher.rl("missingno");
 
                 fishCaughtNetworks.add(new FishCaughtNetwork(rl, fcc.count(), fcc.fastestTicks(), fcc.averageTicks()));
             }
@@ -211,7 +280,7 @@ public class Payloads
 
     }
 
-    //send fishes caught to client
+    //send trophies caught to client
     public static class TrophiesCaughtPayload
     {
         private final List<TrophyProperties> tps;
@@ -250,7 +319,7 @@ public class Payloads
 
     }
 
-    //send fishes caught to client
+    //send fishes notifications to player
     public static class FishesNotificationPayload
     {
         private final List<ResourceLocation> fps;
@@ -263,9 +332,14 @@ public class Payloads
 
             for (FishProperties fp : fps)
             {
-                ResourceLocation rl = fishProperties.getKey(fp);
+                ResourceLocation rl = null;
 
-                if(rl == null) rl = Starcatcher.rl("missingno");
+                for (FishProperties fpRegistry : fishProperties)
+                {
+                    if(fpRegistry.equals(fp)) rl = fishProperties.getKey(fpRegistry);
+                }
+
+                if (rl == null) rl = Starcatcher.rl("missingno");
 
                 notifRLs.add(rl);
             }

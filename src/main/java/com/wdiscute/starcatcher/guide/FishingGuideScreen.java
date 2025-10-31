@@ -19,6 +19,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -30,6 +31,7 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraftforge.network.PacketDistributor;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -1542,6 +1544,25 @@ public class FishingGuideScreen extends Screen
         Minecraft.getInstance().options.advancedItemTooltips = advancedTooltips;
         //todo send packet of fishes seen to remove notification
         //PacketDistributor.sendToServer(new Payloads.FPsSeen(fpsSeen));
+
+        List<ResourceLocation> notifRLs = new ArrayList<>();
+
+        Registry<FishProperties> fishProperties = player.level().registryAccess().registryOrThrow(Starcatcher.FISH_REGISTRY);
+
+        for (FishProperties fp : fpsSeen)
+        {
+            ResourceLocation rl = fishProperties.getKey(fp);
+
+            if(rl == null) rl = Starcatcher.rl("missingno");
+
+            notifRLs.add(rl);
+        }
+
+        Payloads.CHANNEL.send(
+                PacketDistributor.SERVER.with(null),
+                new Payloads.FishesSeenPayload(notifRLs)
+        );
+
         super.onClose();
     }
 

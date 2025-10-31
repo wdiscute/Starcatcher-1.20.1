@@ -6,11 +6,11 @@
       "item": "minecraft:bone_meal"
     },
     {
-      "item": "minecraft:moss_carpet"
+      "item": "minecraft:enchanted_golden_apple"
     }
   ],
   "result": {
-    "id": "starcatcher:lush_bait",
-    "count": 4
+    "item": "starcatcher:legendary_bait",
+    "count": 64
   }
 }

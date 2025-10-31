@@ -6,11 +6,11 @@
       "item": "minecraft:bone_meal"
     },
     {
-      "item": "minecraft:sculk"
+      "item": "minecraft:moss_block"
     }
   ],
   "result": {
-    "id": "starcatcher:sculk_bait",
+    "item": "starcatcher:lush_bait",
     "count": 4
   }
 }

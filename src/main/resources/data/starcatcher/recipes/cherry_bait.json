@@ -6,11 +6,11 @@
       "item": "minecraft:bone_meal"
     },
     {
-      "item": "minecraft:golden_apple"
+      "item": "minecraft:pink_petals"
     }
   ],
   "result": {
-    "id": "starcatcher:legendary_bait",
+    "item": "starcatcher:cherry_bait",
     "count": 4
   }
 }

@@ -1,16 +1,19 @@
 package com.wdiscute.starcatcher.networkandcodecs;
 
+import com.mojang.logging.LogUtils;
 import com.wdiscute.starcatcher.items.ColorfulBobber;
 import com.wdiscute.starcatcher.secretnotes.SecretNote;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.ItemStack;
+import org.slf4j.Logger;
 
 public class ModDataComponents
 {
-    public static final String BOBBER = "bobber";
-    public static final String BAIT = "bait";
-    public static final String HOOK = "hook";
+    private static final Logger LOGGER = LogUtils.getLogger();
 
     public enum Slots implements StringRepresentable
     {
@@ -32,42 +35,76 @@ public class ModDataComponents
     }
 
 
+
+
+
+
+
     //secret note data component
     public static void setSecretNote(ItemStack is, SecretNote.Note note)
     {
-
+        is.getOrCreateTag().putString("secret_note", note.getSerializedName());
     }
 
     public static SecretNote.Note getSecretNote(ItemStack is)
     {
-        return SecretNote.Note.SAMPLE_NOTE;
+        return SecretNote.Note.getBySerializedName(is.getTag().getString("secret_note"));
     }
+
+
+
+
+
+
+
 
 
 
     //fish properties data component
     public static FishProperties getFishProperties(ItemStack is)
     {
+        if (is.getOrCreateTag().contains("fish_properties"))
+            return FishProperties.CODEC.decode(NbtOps.INSTANCE, is.getTag().get("fish_properties")).result().get().getFirst();
+
         return FishProperties.DEFAULT;
     }
 
-    public static void setFishProperties(ItemStack is, FishProperties tp)
+    public static void setFishProperties(ItemStack is, FishProperties fp)
     {
+        CompoundTag compoundTag = new CompoundTag();
 
+        FishProperties.CODEC.encode(fp, NbtOps.INSTANCE, new CompoundTag())
+                .resultOrPartial(LOGGER::warn).ifPresent(tag -> compoundTag.put("fish_properties", tag));
+
+        is.getOrCreateTag().put("fish_properties", compoundTag);
     }
+
+
+
 
 
 
     //trophy properties data component
-    public static void setTrophyProperties(ItemStack is, TrophyProperties tp)
-    {
-
-    }
-
     public static TrophyProperties getTrophyProperties(ItemStack is)
     {
+        if (is.getOrCreateTag().contains("trophy_properties"))
+            return TrophyProperties.CODEC.decode(NbtOps.INSTANCE, is.getOrCreateTag().get("trophy_properties")).result().get().getFirst();
+
         return TrophyProperties.DEFAULT;
     }
+
+    public static void setTrophyProperties(ItemStack is, TrophyProperties tp)
+    {
+        CompoundTag compoundTag = new CompoundTag();
+
+        TrophyProperties.CODEC.encode(tp, NbtOps.INSTANCE, new CompoundTag())
+                .resultOrPartial(LOGGER::warn).ifPresent(tag -> compoundTag.put("trophy_properties", tag));
+
+        is.getOrCreateTag().put("trophy_properties", compoundTag);
+    }
+
+
+
 
 
 
@@ -91,10 +128,13 @@ public class ModDataComponents
                     compound.getFloat("starcatcher_r"),
                     compound.getFloat("starcatcher_g"),
                     compound.getFloat("starcatcher_b")
-                    );
+            );
         }
         return ColorfulBobber.BobberColor.DEFAULT;
     }
+
+
+
 
 
 

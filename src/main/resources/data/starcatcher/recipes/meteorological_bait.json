@@ -6,11 +6,11 @@
       "item": "minecraft:bone_meal"
     },
     {
-      "item": "minecraft:lily_pad"
+      "item": "minecraft:heart_of_the_sea"
     }
   ],
   "result": {
-    "id": "starcatcher:murkwater_bait",
-    "count": 4
+    "item": "starcatcher:meteorological_bait",
+    "count": 32
   }
 }

@@ -3,11 +3,14 @@
   "category": "misc",
   "ingredients": [
     {
-      "item": "starcatcher:mossy_boot"
+      "item": "minecraft:bone_meal"
+    },
+    {
+      "item": "minecraft:mangrove_leaves"
     }
   ],
   "result": {
-    "id": "minecraft:moss_block",
+    "item": "starcatcher:murkwater_bait",
     "count": 4
   }
 }

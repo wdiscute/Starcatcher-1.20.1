@@ -3,11 +3,14 @@
   "category": "misc",
   "ingredients": [
     {
-      "item": "starcatcher:fish_bones"
+      "item": "minecraft:bone_meal"
+    },
+    {
+      "item": "minecraft:pointed_dripstone"
     }
   ],
   "result": {
-    "id": "minecraft:bone_meal",
+    "item": "starcatcher:dripstone_bait",
     "count": 4
   }
 }

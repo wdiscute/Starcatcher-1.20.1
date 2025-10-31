@@ -6,11 +6,11 @@
       "item": "minecraft:bone_meal"
     },
     {
-      "item": "minecraft:heart_of_the_sea"
+      "item": "minecraft:golden_apple"
     }
   ],
   "result": {
-    "id": "starcatcher:meteorological_bait",
-    "count": 32
+    "item": "starcatcher:legendary_bait",
+    "count": 4
   }
 }

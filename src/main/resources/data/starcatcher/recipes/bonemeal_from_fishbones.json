@@ -3,14 +3,11 @@
   "category": "misc",
   "ingredients": [
     {
-      "item": "minecraft:bone_meal"
-    },
-    {
-      "item": "minecraft:moss_block"
+      "item": "starcatcher:fish_bones"
     }
   ],
   "result": {
-    "id": "starcatcher:lush_bait",
+    "item": "minecraft:bone_meal",
     "count": 4
   }
 }

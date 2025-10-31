@@ -6,11 +6,11 @@
       "item": "minecraft:bone_meal"
     },
     {
-      "item": "minecraft:pink_petals"
+      "item": "starcatcher:mossy_boot"
     }
   ],
   "result": {
-    "id": "starcatcher:cherry_bait",
+    "item": "starcatcher:lush_bait",
     "count": 4
   }
 }

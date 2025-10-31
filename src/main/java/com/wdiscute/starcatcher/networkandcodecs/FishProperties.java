@@ -90,6 +90,12 @@ public record FishProperties(
     );
 
 
+    public static FishProperties getByRL(ResourceLocation resourceLocation, Level level)
+    {
+        return level.registryAccess().registryOrThrow(Starcatcher.FISH_REGISTRY).get(resourceLocation);
+    }
+
+
     //region with()
 
     public FishProperties withFish(Item fish)

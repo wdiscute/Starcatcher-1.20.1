@@ -5,10 +5,12 @@ import com.wdiscute.starcatcher.Starcatcher;
 import com.wdiscute.starcatcher.bob.FishingBobEntity;
 import com.wdiscute.starcatcher.minigame.FishingMinigameScreen;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -154,21 +156,39 @@ public class Payloads
     //send fishes caught to client
     public static class FishesCaughtPayload
     {
-        private final List<FishCaughtCounter> fishesCaught;
+        private final List<FishCaughtNetwork> fishesCaught;
 
-        public FishesCaughtPayload(List<FishCaughtCounter> fishCaught)
+        public FishesCaughtPayload(List<FishCaughtCounter> fishCaught, Player player)
+        {
+            List<FishCaughtNetwork> fishCaughtNetworks = new ArrayList<>();
+
+            Registry<FishProperties> fishProperties = player.level().registryAccess().registryOrThrow(Starcatcher.FISH_REGISTRY);
+
+            for (FishCaughtCounter fcc : fishCaught)
+            {
+                ResourceLocation rl = fishProperties.getKey(fcc.fp());
+
+                if(rl == null) rl = Starcatcher.rl("missingno");
+
+                fishCaughtNetworks.add(new FishCaughtNetwork(rl, fcc.count(), fcc.fastestTicks(), fcc.averageTicks()));
+            }
+
+            this.fishesCaught = fishCaughtNetworks;
+        }
+
+        public FishesCaughtPayload(List<FishCaughtNetwork> fishCaught)
         {
             this.fishesCaught = fishCaught;
         }
 
         public static void encode(FishesCaughtPayload fishesCaughtPayload, FriendlyByteBuf buf)
         {
-            buf.writeJsonWithCodec(FishCaughtCounter.LIST_CODEC, fishesCaughtPayload.fishesCaught);
+            buf.writeJsonWithCodec(FishCaughtNetwork.LIST_CODEC, fishesCaughtPayload.fishesCaught);
         }
 
         public static FishesCaughtPayload decode(FriendlyByteBuf buf)
         {
-            List<FishCaughtCounter> fishesCaught = buf.readJsonWithCodec(FishCaughtCounter.LIST_CODEC);
+            List<FishCaughtNetwork> fishesCaught = buf.readJsonWithCodec(FishCaughtNetwork.LIST_CODEC);
 
             return new FishesCaughtPayload(fishesCaught);
         }
@@ -184,9 +204,9 @@ public class Payloads
 
 
         @OnlyIn(Dist.CLIENT)
-        private static void client(List<FishCaughtCounter> fishesCaught)
+        private static void client(List<FishCaughtNetwork> fishesCaught)
         {
-            DataAttachments.get(Minecraft.getInstance().player).setFishesCaught(fishesCaught);
+            DataAttachments.setFishesCaughtClient(fishesCaught);
         }
 
     }
@@ -233,21 +253,39 @@ public class Payloads
     //send fishes caught to client
     public static class FishesNotificationPayload
     {
-        private final List<FishProperties> fps;
+        private final List<ResourceLocation> fps;
 
-        public FishesNotificationPayload(List<FishProperties> tpsCaught)
+        public FishesNotificationPayload(List<FishProperties> fps, Player player)
+        {
+            List<ResourceLocation> notifRLs = new ArrayList<>();
+
+            Registry<FishProperties> fishProperties = player.level().registryAccess().registryOrThrow(Starcatcher.FISH_REGISTRY);
+
+            for (FishProperties fp : fps)
+            {
+                ResourceLocation rl = fishProperties.getKey(fp);
+
+                if(rl == null) rl = Starcatcher.rl("missingno");
+
+                notifRLs.add(rl);
+            }
+
+            this.fps = notifRLs;
+        }
+
+        public FishesNotificationPayload(List<ResourceLocation> tpsCaught)
         {
             this.fps = tpsCaught;
         }
 
         public static void encode(FishesNotificationPayload fishesNotificationPayload, FriendlyByteBuf buf)
         {
-            buf.writeJsonWithCodec(FishProperties.LIST_CODEC, fishesNotificationPayload.fps);
+            buf.writeJsonWithCodec(ResourceLocation.CODEC.listOf(), fishesNotificationPayload.fps);
         }
 
         public static FishesNotificationPayload decode(FriendlyByteBuf buf)
         {
-            List<FishProperties> tps = buf.readJsonWithCodec(FishProperties.LIST_CODEC);
+            List<ResourceLocation> tps = buf.readJsonWithCodec(ResourceLocation.CODEC.listOf());
 
             return new FishesNotificationPayload(tps);
         }
@@ -262,9 +300,9 @@ public class Payloads
         }
 
         @OnlyIn(Dist.CLIENT)
-        private static void client(List<FishProperties> fps)
+        private static void client(List<ResourceLocation> fps)
         {
-            DataAttachments.get(Minecraft.getInstance().player).setFishNotifications(fps);
+            DataAttachments.setFishNotificationsClient(fps);
         }
 
     }

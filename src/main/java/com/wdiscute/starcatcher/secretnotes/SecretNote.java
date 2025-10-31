@@ -13,6 +13,8 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+import java.util.Arrays;
+
 public class SecretNote extends Item
 {
     public SecretNote()
@@ -23,7 +25,7 @@ public class SecretNote extends Item
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand)
     {
-        if(level.isClientSide) openScreen(ModDataComponents.getSecretNote(player.getItemInHand(usedHand)));
+        if (level.isClientSide) openScreen(ModDataComponents.getSecretNote(player.getItemInHand(usedHand)));
         return super.use(level, player, usedHand);
     }
 
@@ -56,6 +58,12 @@ public class SecretNote extends Item
         {
             return this.key;
         }
+
+        public static Note getBySerializedName(String s)
+        {
+            return Arrays.stream(Note.values()).filter(n -> n.getSerializedName().equals(s)).findFirst().orElse(SAMPLE_NOTE);
+        }
+
     }
 
 

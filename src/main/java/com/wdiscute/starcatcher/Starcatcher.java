@@ -1,6 +1,5 @@
 package com.wdiscute.starcatcher;
 
-import com.mojang.logging.LogUtils;
 import com.wdiscute.starcatcher.bob.FishingBobModel;
 import com.wdiscute.starcatcher.bob.FishingBobRenderer;
 import com.wdiscute.starcatcher.fishentity.FishEntity;
@@ -13,17 +12,20 @@ import com.wdiscute.starcatcher.particles.FishingNotificationParticles;
 import com.wdiscute.starcatcher.rod.FishingRodScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
+import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.EntityRenderersEvent;
@@ -33,6 +35,7 @@ import net.minecraftforge.common.capabilities.*;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
+import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -41,12 +44,8 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.registries.DataPackRegistryEvent;
-import org.slf4j.Logger;
 
-import javax.xml.crypto.Data;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(Starcatcher.MOD_ID)
@@ -65,11 +64,6 @@ public class Starcatcher
         return ResourceLocation.fromNamespaceAndPath(Starcatcher.MOD_ID, s);
     }
 
-    public static Map<Player, String> fishingPlayersMap = new HashMap<>();
-    public static Map<Player, List<FishCaughtCounter>> FPsCaught = new HashMap<>();
-    public static Map<Player, List<TrophyProperties>> TPsCaught = new HashMap<>();
-    public static Map<Player, List<FishProperties>> FPsNotifications = new HashMap<>();
-
     @OnlyIn(Dist.CLIENT)
     public static void fishCaughtToast(FishProperties fp)
     {
@@ -78,7 +72,6 @@ public class Starcatcher
 
     public Starcatcher(FMLJavaModLoadingContext context)
     {
-
         IEventBus eventBus = context.getModEventBus();
 
         ModCreativeModeTabs.register(eventBus);
@@ -89,8 +82,6 @@ public class Starcatcher
         ModMenuTypes.register(eventBus);
 
         Payloads.register();
-
-        //modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }
 
     @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
@@ -139,15 +130,125 @@ public class Starcatcher
                 DataAttachmentCapability playerCap = DataAttachments.get(player);
 
                 Payloads.CHANNEL.send(PacketDistributor.PLAYER.with(() -> sp),
-                        new Payloads.FishesCaughtPayload(playerCap.fishesCaught()));
+                        new Payloads.FishesCaughtPayload(playerCap.fishesCaught(), sp));
 
                 Payloads.CHANNEL.send(PacketDistributor.PLAYER.with(() -> sp),
                         new Payloads.TrophiesCaughtPayload(playerCap.trophiesCaught()));
 
                 Payloads.CHANNEL.send(PacketDistributor.PLAYER.with(() -> sp),
-                        new Payloads.FishesNotificationPayload(playerCap.fishNotifications()));
+                        new Payloads.FishesNotificationPayload(playerCap.fishNotifications(), sp));
             }
 
+        }
+
+        @SubscribeEvent
+        public static void trophyTooltip(ItemTooltipEvent event)
+        {
+            List<Component> comp = event.getToolTip();
+            ItemStack stack = event.getItemStack();
+
+            TrophyProperties trophyProperties = ModDataComponents.getTrophyProperties(stack);
+
+            if (ModDataComponents.getTrophyProperties(stack) != TrophyProperties.DEFAULT)
+            {
+                TrophyProperties tp = ModDataComponents.getTrophyProperties(stack);
+
+                if (tp.trophyType() == TrophyProperties.TrophyType.TROPHY)
+                    if (Screen.hasShiftDown())
+                    {
+                        comp.add(Component.translatable("tooltip.libtooltips.generic.shift_down"));
+                        comp.add(Component.translatable("tooltip.libtooltips.generic.empty"));
+                        comp.add(Component.translatable("tooltip.starcatcher.trophy.0"));
+                        comp.add(Component.translatable("tooltip.starcatcher.trophy.1"));
+
+                        List<Component> list = new java.util.ArrayList<>();
+
+                        //all
+                        if (tp.all().total() != 0) list.add(Tooltips.decodeString(
+                                I18n.get("tooltip.starcatcher.trophy.total")
+                                        .replace("&", tp.all().total() + "")
+                                        .replace("$", I18n.get("tooltip.starcatcher.trophy.all"))
+                        ));
+
+                        if (tp.all().unique() != 0) list.add(
+                                Tooltips.decodeString(I18n.get("tooltip.starcatcher.trophy.unique")
+                                        .replace("&", tp.all().unique() + "")
+                                        .replace("$", I18n.get("tooltip.starcatcher.trophy.all"))));
+
+                        //common
+                        if (tp.common().total() != 0) list.add(
+                                Tooltips.decodeString(I18n.get("tooltip.starcatcher.trophy.total")
+                                        .replace("&", tp.common().total() + "")
+                                        .replace("$", I18n.get("tooltip.starcatcher.trophy.common"))));
+
+                        if (tp.common().unique() != 0) list.add(
+                                Tooltips.decodeString(I18n.get("tooltip.starcatcher.trophy.unique")
+                                        .replace("&", tp.common().unique() + "")
+                                        .replace("$", I18n.get("tooltip.starcatcher.trophy.common"))));
+
+                        //uncommon
+                        if (tp.uncommon().total() != 0) list.add(
+                                Tooltips.decodeString(I18n.get("tooltip.starcatcher.trophy.total")
+                                        .replace("&", tp.uncommon().total() + "")
+                                        .replace("$", I18n.get("tooltip.starcatcher.trophy.uncommon"))));
+
+                        if (tp.uncommon().unique() != 0) list.add(
+                                Tooltips.decodeString(I18n.get("tooltip.starcatcher.trophy.unique")
+                                        .replace("&", tp.uncommon().unique() + "")
+                                        .replace("$", I18n.get("tooltip.starcatcher.trophy.uncommon"))));
+
+                        //rare
+                        if (tp.rare().total() != 0) list.add(
+                                Tooltips.decodeString(I18n.get("tooltip.starcatcher.trophy.total")
+                                        .replace("&", tp.rare().total() + "")
+                                        .replace("$", I18n.get("tooltip.starcatcher.trophy.rare"))));
+
+                        if (tp.rare().unique() != 0) list.add(
+                                Tooltips.decodeString(I18n.get("tooltip.starcatcher.trophy.unique")
+                                        .replace("&", tp.rare().unique() + "")
+                                        .replace("$", I18n.get("tooltip.starcatcher.trophy.rare"))));
+
+                        //epic
+                        if (tp.epic().total() != 0) list.add(
+                                Tooltips.decodeString(I18n.get("tooltip.starcatcher.trophy.total")
+                                        .replace("&", tp.epic().total() + "")
+                                        .replace("$", I18n.get("tooltip.starcatcher.trophy.epic"))));
+
+                        if (tp.epic().unique() != 0) list.add(
+                                Tooltips.decodeString(I18n.get("tooltip.starcatcher.trophy.unique")
+                                        .replace("&", tp.epic().unique() + "")
+                                        .replace("$", I18n.get("tooltip.starcatcher.trophy.epic"))));
+
+                        //legendary
+                        if (tp.legendary().total() != 0) list.add(
+                                Tooltips.decodeString(I18n.get("tooltip.starcatcher.trophy.total")
+                                        .replace("&", tp.legendary().total() + "")
+                                        .replace("$", I18n.get("tooltip.starcatcher.trophy.legendary"))));
+
+                        if (tp.legendary().unique() != 0) list.add(
+                                Tooltips.decodeString(I18n.get("tooltip.starcatcher.trophy.unique")
+                                        .replace("&", tp.legendary().unique() + "")
+                                        .replace("$", I18n.get("tooltip.starcatcher.trophy.legendary"))));
+
+                        if (list.size() == 1)
+                        {
+                            comp.add(Component.translatable("tooltip.starcatcher.trophy.once")
+                                    .append(list.get(0))
+                                    .append(Component.translatable("tooltip.starcatcher.trophy.have_been_caught")));
+                        }
+                        else
+                        {
+                            comp.add(Component.translatable("tooltip.starcatcher.trophy.2"));
+                            comp.addAll(list);
+                        }
+
+                    }
+                    else
+                    {
+                        comp.add(Component.translatable("tooltip.libtooltips.generic.shift_up"));
+                    }
+
+            }
         }
 
 
@@ -171,145 +272,12 @@ public class Starcatcher
         {
             event.put(ModEntities.FISH.get(), FishEntity.createAttributes().build());
         }
-
-//        @SubscribeEvent
-//        public static void registerPayloads(RegisterPayloadHandlersEvent event)
-//        {
-//
-//            registrar.playToServer(
-//                    Payloads.FishingCompletedPayload.TYPE,
-//                    Payloads.FishingCompletedPayload.STREAM_CODEC,
-//                    PayloadReceiver::receiveFishingCompletedServer
-//            );
-//
-//            registrar.playToClient(
-//                    Payloads.FishCaughtPayload.TYPE,
-//                    Payloads.FishCaughtPayload.STREAM_CODEC,
-//                    PayloadReceiver::receiveFishCaught
-//            );
-//
-//            registrar.playToServer(
-//                    Payloads.FPsSeen.TYPE,
-//                    Payloads.FPsSeen.STREAM_CODEC,
-//                    PayloadReceiver::receiveFPsSeen
-//            );
-//
-//        }
-
     }
 
     @OnlyIn(Dist.CLIENT)
     @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
     public static class ModClientEvents
     {
-
-//        @SubscribeEvent
-//        public static void trophyTooltip(ItemTooltipEvent event)
-//        {
-//            List<Component> comp = event.getToolTip();
-//            ItemStack stack = event.getItemStack();
-//
-//            if (stack.has(ModDataComponents.TROPHY))
-//            {
-//                TrophyProperties tp = stack.get(ModDataComponents.TROPHY);
-//
-//                if (tp.trophyType() == TrophyProperties.TrophyType.TROPHY)
-//                    if (event.getFlags().hasShiftDown())
-//                    {
-//                        comp.add(Component.translatable("tooltip.libtooltips.generic.shift_down"));
-//                        comp.add(Component.translatable("tooltip.libtooltips.generic.empty"));
-//                        comp.add(Component.translatable("tooltip.starcatcher.trophy.0"));
-//                        comp.add(Component.translatable("tooltip.starcatcher.trophy.1"));
-//
-//                        List<Component> list = new java.util.ArrayList<>();
-//
-//                        //all
-//                        if (tp.all().total() != 0) list.add(Tooltips.decodeString(
-//                                I18n.get("tooltip.starcatcher.trophy.total")
-//                                        .replace("&", tp.all().total() + "")
-//                                        .replace("$", I18n.get("tooltip.starcatcher.trophy.all"))
-//                        ));
-//
-//                        if (tp.all().unique() != 0) list.add(
-//                                Tooltips.decodeString(I18n.get("tooltip.starcatcher.trophy.unique")
-//                                        .replace("&", tp.all().unique() + "")
-//                                        .replace("$", I18n.get("tooltip.starcatcher.trophy.all"))));
-//
-//                        //common
-//                        if (tp.common().total() != 0) list.add(
-//                                Tooltips.decodeString(I18n.get("tooltip.starcatcher.trophy.total")
-//                                        .replace("&", tp.common().total() + "")
-//                                        .replace("$", I18n.get("tooltip.starcatcher.trophy.common"))));
-//
-//                        if (tp.common().unique() != 0) list.add(
-//                                Tooltips.decodeString(I18n.get("tooltip.starcatcher.trophy.unique")
-//                                        .replace("&", tp.common().unique() + "")
-//                                        .replace("$", I18n.get("tooltip.starcatcher.trophy.common"))));
-//
-//                        //uncommon
-//                        if (tp.uncommon().total() != 0) list.add(
-//                                Tooltips.decodeString(I18n.get("tooltip.starcatcher.trophy.total")
-//                                        .replace("&", tp.uncommon().total() + "")
-//                                        .replace("$", I18n.get("tooltip.starcatcher.trophy.uncommon"))));
-//
-//                        if (tp.uncommon().unique() != 0) list.add(
-//                                Tooltips.decodeString(I18n.get("tooltip.starcatcher.trophy.unique")
-//                                        .replace("&", tp.uncommon().unique() + "")
-//                                        .replace("$", I18n.get("tooltip.starcatcher.trophy.uncommon"))));
-//
-//                        //rare
-//                        if (tp.rare().total() != 0) list.add(
-//                                Tooltips.decodeString(I18n.get("tooltip.starcatcher.trophy.total")
-//                                        .replace("&", tp.rare().total() + "")
-//                                        .replace("$", I18n.get("tooltip.starcatcher.trophy.rare"))));
-//
-//                        if (tp.rare().unique() != 0) list.add(
-//                                Tooltips.decodeString(I18n.get("tooltip.starcatcher.trophy.unique")
-//                                        .replace("&", tp.rare().unique() + "")
-//                                        .replace("$", I18n.get("tooltip.starcatcher.trophy.rare"))));
-//
-//                        //epic
-//                        if (tp.epic().total() != 0) list.add(
-//                                Tooltips.decodeString(I18n.get("tooltip.starcatcher.trophy.total")
-//                                        .replace("&", tp.epic().total() + "")
-//                                        .replace("$", I18n.get("tooltip.starcatcher.trophy.epic"))));
-//
-//                        if (tp.epic().unique() != 0) list.add(
-//                                Tooltips.decodeString(I18n.get("tooltip.starcatcher.trophy.unique")
-//                                        .replace("&", tp.epic().unique() + "")
-//                                        .replace("$", I18n.get("tooltip.starcatcher.trophy.epic"))));
-//
-//                        //legendary
-//                        if (tp.legendary().total() != 0) list.add(
-//                                Tooltips.decodeString(I18n.get("tooltip.starcatcher.trophy.total")
-//                                        .replace("&", tp.legendary().total() + "")
-//                                        .replace("$", I18n.get("tooltip.starcatcher.trophy.legendary"))));
-//
-//                        if (tp.legendary().unique() != 0) list.add(
-//                                Tooltips.decodeString(I18n.get("tooltip.starcatcher.trophy.unique")
-//                                        .replace("&", tp.legendary().unique() + "")
-//                                        .replace("$", I18n.get("tooltip.starcatcher.trophy.legendary"))));
-//
-//                        if (list.size() == 1)
-//                        {
-//                            comp.add(Component.translatable("tooltip.starcatcher.trophy.once")
-//                                    .append(list.getFirst())
-//                                    .append(Component.translatable("tooltip.starcatcher.trophy.have_been_caught")));
-//                        }
-//                        else
-//                        {
-//                            comp.add(Component.translatable("tooltip.starcatcher.trophy.2"));
-//                            comp.addAll(list);
-//                        }
-//
-//                    }
-//                    else
-//                    {
-//                        comp.add(Component.translatable("tooltip.libtooltips.generic.shift_up"));
-//                    }
-//
-//            }
-//        }
 
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event)

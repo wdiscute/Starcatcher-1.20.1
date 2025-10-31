@@ -1,16 +1,23 @@
 package com.wdiscute.starcatcher.networkandcodecs;
 
 import com.mojang.logging.LogUtils;
+import com.wdiscute.starcatcher.Starcatcher;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.network.PacketDistributor;
 import org.slf4j.Logger;
 
+import javax.xml.crypto.Data;
+import java.util.ArrayList;
 import java.util.List;
 
 public class DataAttachments implements DataAttachmentCapability, INBTSerializable<CompoundTag>
@@ -45,7 +52,7 @@ public class DataAttachments implements DataAttachmentCapability, INBTSerializab
     {
         this.fishing = s;
 
-        if(this.player instanceof ServerPlayer sp)
+        if (this.player instanceof ServerPlayer sp)
         {
             Payloads.CHANNEL.send(
                     PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> sp),
@@ -60,16 +67,34 @@ public class DataAttachments implements DataAttachmentCapability, INBTSerializab
         return fishesCaught;
     }
 
+    public static void setFishesCaughtClient(List<FishCaughtNetwork> fishCaughtNetworks)
+    {
+        List<FishCaughtCounter> list = new ArrayList<>();
+
+        LocalPlayer player = Minecraft.getInstance().player;
+
+        for (FishCaughtNetwork fishCaughtNetwork : fishCaughtNetworks)
+        {
+            FishProperties fp = FishProperties.getByRL(fishCaughtNetwork.rl(), player.level());
+
+            if(fp == null) fp = FishProperties.DEFAULT;
+
+            list.add(new FishCaughtCounter(fp, fishCaughtNetwork.count(), fishCaughtNetwork.fastestTicks(), fishCaughtNetwork.averageTicks()));
+        }
+
+        DataAttachments.get(player).setFishesCaught(list);
+    }
+
     @Override
     public void setFishesCaught(List<FishCaughtCounter> list)
     {
         this.fishesCaught = list;
 
-        if(this.player instanceof ServerPlayer sp)
+        if (this.player instanceof ServerPlayer sp)
         {
             Payloads.CHANNEL.send(
                     PacketDistributor.PLAYER.with(() -> sp),
-                    new Payloads.FishesCaughtPayload(this.fishesCaught)
+                    new Payloads.FishesCaughtPayload(list, sp)
             );
         }
 
@@ -86,7 +111,7 @@ public class DataAttachments implements DataAttachmentCapability, INBTSerializab
     {
         this.trophiesCaught = list;
 
-        if(this.player instanceof ServerPlayer sp)
+        if (this.player instanceof ServerPlayer sp)
         {
             Payloads.CHANNEL.send(
                     PacketDistributor.PLAYER.with(() -> sp),
@@ -101,16 +126,35 @@ public class DataAttachments implements DataAttachmentCapability, INBTSerializab
         return notifications;
     }
 
+    public static void setFishNotificationsClient(List<ResourceLocation> listRLs)
+    {
+        List<FishProperties> notifications = new ArrayList<>();
+
+        LocalPlayer player = Minecraft.getInstance().player;
+
+        for (ResourceLocation rl : listRLs)
+        {
+            FishProperties fp = FishProperties.getByRL(rl, player.level());
+
+            if(fp == null) fp = FishProperties.DEFAULT;
+
+            notifications.add(fp);
+        }
+
+        DataAttachments.get(player).setFishNotifications(notifications);
+
+    }
+
     @Override
     public void setFishNotifications(List<FishProperties> list)
     {
         this.notifications = list;
 
-        if(this.player instanceof ServerPlayer sp)
+        if (this.player instanceof ServerPlayer sp)
         {
             Payloads.CHANNEL.send(
                     PacketDistributor.PLAYER.with(() -> sp),
-                    new Payloads.FishesNotificationPayload(this.notifications)
+                    new Payloads.FishesNotificationPayload(this.notifications, sp)
             );
         }
     }
@@ -135,13 +179,13 @@ public class DataAttachments implements DataAttachmentCapability, INBTSerializab
     @Override
     public void deserializeNBT(CompoundTag tag)
     {
-        if(tag.contains("fishes_caught", 9))
+        if (tag.contains("fishes_caught", 9))
             this.fishesCaught = FishCaughtCounter.LIST_CODEC.decode(NbtOps.INSTANCE, tag.getList("fishes_caught", Tag.TAG_COMPOUND)).result().get().getFirst();
 
-        if(tag.contains("trophies_caught", 9))
+        if (tag.contains("trophies_caught", 9))
             this.trophiesCaught = TrophyProperties.LIST_CODEC.decode(NbtOps.INSTANCE, tag.getList("trophies_caught", Tag.TAG_COMPOUND)).result().get().getFirst();
 
-        if(tag.contains("notifications", 9))
+        if (tag.contains("notifications", 9))
             this.notifications = FishProperties.LIST_CODEC.decode(NbtOps.INSTANCE, tag.getList("notifications", Tag.TAG_COMPOUND)).result().get().getFirst();
     }
 }

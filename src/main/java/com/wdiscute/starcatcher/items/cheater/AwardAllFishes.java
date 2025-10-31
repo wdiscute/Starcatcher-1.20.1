@@ -48,7 +48,6 @@ public class AwardAllFishes extends Item
         }
 
         DataAttachments.get(player).setFishNotifications(fishes);
-        //player.setData(ModDataAttachments.FISHES_NOTIFICATION, fishes);
 
         return InteractionResultHolder.success(player.getItemInHand(usedHand));
     }

@@ -1,6 +1,8 @@
 package com.wdiscute.starcatcher.networkandcodecs;
 
+import com.mojang.datafixers.util.Pair;
 import com.mojang.logging.LogUtils;
+import com.mojang.serialization.DataResult;
 import com.wdiscute.starcatcher.items.ColorfulBobber;
 import com.wdiscute.starcatcher.secretnotes.SecretNote;
 import net.minecraft.nbt.CompoundTag;
@@ -10,6 +12,8 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.ItemStack;
 import org.slf4j.Logger;
+
+import java.util.Optional;
 
 public class ModDataComponents
 {
@@ -88,19 +92,21 @@ public class ModDataComponents
     public static TrophyProperties getTrophyProperties(ItemStack is)
     {
         if (is.getOrCreateTag().contains("trophy_properties"))
-            return TrophyProperties.CODEC.decode(NbtOps.INSTANCE, is.getOrCreateTag().get("trophy_properties")).result().get().getFirst();
+        {
+            CompoundTag trophyProperties = is.getOrCreateTag().getCompound("trophy_properties");
+
+            DataResult<TrophyProperties> decode = TrophyProperties.CODEC.parse(NbtOps.INSTANCE, trophyProperties);
+
+            return decode.result().orElse(TrophyProperties.DEFAULT);
+        }
 
         return TrophyProperties.DEFAULT;
     }
 
     public static void setTrophyProperties(ItemStack is, TrophyProperties tp)
     {
-        CompoundTag compoundTag = new CompoundTag();
-
         TrophyProperties.CODEC.encode(tp, NbtOps.INSTANCE, new CompoundTag())
-                .resultOrPartial(LOGGER::warn).ifPresent(tag -> compoundTag.put("trophy_properties", tag));
-
-        is.getOrCreateTag().put("trophy_properties", compoundTag);
+                .resultOrPartial(LOGGER::warn).ifPresent(tag -> is.getOrCreateTag().put("trophy_properties", tag));
     }
 
 

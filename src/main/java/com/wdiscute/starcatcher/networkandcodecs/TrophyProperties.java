@@ -26,7 +26,7 @@ public record TrophyProperties
 {
 
     public static final TrophyProperties DEFAULT = new TrophyProperties(
-            FishProperties.DEFAULT.withFish(Items.DIRT),
+            FishProperties.DEFAULT,
             TrophyType.EXTRA,
             "Missingno Trophy",
             RarityProgress.DEFAULT,
@@ -40,7 +40,7 @@ public record TrophyProperties
 
     public static final Codec<TrophyProperties> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
-                    FishProperties.CODEC.optionalFieldOf("fish_properties", DEFAULT.fp).forGetter(TrophyProperties::fp),
+                    FishProperties.CODEC.fieldOf("fish_properties").forGetter(TrophyProperties::fp),
                     TrophyType.CODEC.optionalFieldOf("trophy_type", DEFAULT.trophyType).forGetter(TrophyProperties::trophyType),
                     Codec.STRING.optionalFieldOf("custom_name", DEFAULT.customName).forGetter(TrophyProperties::customName),
                     RarityProgress.CODEC.optionalFieldOf("all", DEFAULT.common).forGetter(TrophyProperties::all),

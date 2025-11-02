@@ -172,7 +172,9 @@ public class FishingBobEntity extends Projectile
                 ModDataComponents.setTrophyProperties(is, tp);
                 //is.set(ModDataComponents.TROPHY, tp);
                 if (!tp.customName().isEmpty())
+                {
                     is.setHoverName(Component.literal(tp.customName()));
+                }
                     //1.20 fix
                     //is.set(DataComponents.ITEM_NAME, Component.literal(tp.customName()));
 
@@ -181,9 +183,9 @@ public class FishingBobEntity extends Projectile
                         is);
 
                 Vec3 vec3 = new Vec3(
-                        org.joml.Math.clamp((player.position().x - position().x) / 25, -1, 1),
-                        0.7 + org.joml.Math.clamp((player.position().y - position().y) / 20, -1, 1),
-                        org.joml.Math.clamp((player.position().z - position().z) / 25, -1, 1));
+                        Mth.clamp((player.position().x - position().x) / 25, -1, 1),
+                        0.7 + Mth.clamp((player.position().y - position().y) / 20, -1, 1),
+                        Mth.clamp((player.position().z - position().z) / 25, -1, 1));
 
                 itemFished.setDeltaMovement(vec3);
                 level().addFreshEntity(itemFished);

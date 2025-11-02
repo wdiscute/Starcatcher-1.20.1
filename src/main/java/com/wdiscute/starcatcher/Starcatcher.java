@@ -20,6 +20,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -147,11 +149,11 @@ public class Starcatcher
             List<Component> comp = event.getToolTip();
             ItemStack stack = event.getItemStack();
 
-            TrophyProperties trophyProperties = ModDataComponents.getTrophyProperties(stack);
-
-            if (ModDataComponents.getTrophyProperties(stack) != TrophyProperties.DEFAULT)
+            if (!ModDataComponents.getTrophyProperties(stack).equals(TrophyProperties.DEFAULT))
             {
                 TrophyProperties tp = ModDataComponents.getTrophyProperties(stack);
+
+                comp.set(0, comp.get(0).copy().withStyle(Style.EMPTY.withItalic(false)));
 
                 if (tp.trophyType() == TrophyProperties.TrophyType.TROPHY)
                     if (Screen.hasShiftDown())

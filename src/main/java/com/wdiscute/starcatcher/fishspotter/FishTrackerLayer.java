@@ -6,16 +6,19 @@ import com.wdiscute.starcatcher.Starcatcher;
 import com.wdiscute.starcatcher.networkandcodecs.DataAttachments;
 import com.wdiscute.starcatcher.networkandcodecs.FishCaughtCounter;
 import com.wdiscute.starcatcher.networkandcodecs.FishProperties;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
+import net.minecraftforge.fml.ISystemReportExtender;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +32,8 @@ public class FishTrackerLayer implements IGuiOverlay
     int uiY;
 
     float offScreen = -150;
+    double oldmil = 0;
+    double mil = 0;
 
     Font font;
 
@@ -65,23 +70,23 @@ public class FishTrackerLayer implements IGuiOverlay
 
         boolean shouldShow = player.getMainHandItem().is(ModItems.FISH_SPOTTER.get()) || player.getOffhandItem().is(ModItems.FISH_SPOTTER.get());
 
-        forgeGui.getGuiTicks();
+        mil = Util.getMillis() - oldmil;
+        oldmil = Util.getMillis();
 
         //smoothly moves ui in and out of screen
         if (!shouldShow)
             if (offScreen > -150)
-                offScreen -= 15 * partialTick;
-                //offScreen -= 15 * deltaTracker.getGameTimeDeltaTicks();
+                offScreen -= 15 * (mil / 70);
             else
             {
                 offScreen = -150;
                 return;
             }
         else if (offScreen < 0)
-            offScreen -= 15 * partialTick;
-            //offScreen += 15 * deltaTracker.getGameTimeDeltaTicks();
+            offScreen += 15 * (mil / 70);
         else
             offScreen = 0;
+
 
 
         guiGraphics.pose().pushPose();

@@ -4,7 +4,7 @@ license="MIT"
 
 [[mods]] #mandatory
 modId="starcatcher" #mandatory
-version="0.9" #mandatory
+version="0.10" #mandatory
 displayName="Starcatcher" #mandatory
 authors="wdiscute, Nikdo53" #optional
 description='''A fishing mod with lots of fishes to collect!'''

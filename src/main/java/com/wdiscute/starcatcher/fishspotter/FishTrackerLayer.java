@@ -116,6 +116,12 @@ public class FishTrackerLayer implements IGuiOverlay
                     is,
                     uiX + 50 + i * 20 % 100,
                     uiY + 10 + i / 5 * 20);
+
+            if(i > 8)
+            {
+                break;
+            }
+
         }
 
         guiGraphics.pose().popPose();

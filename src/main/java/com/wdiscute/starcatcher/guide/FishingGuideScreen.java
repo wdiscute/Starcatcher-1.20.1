@@ -509,7 +509,7 @@ public class FishingGuideScreen extends Screen
 
             if (clickedX > xrender - 10 && clickedX < xrender + 10 && clickedY > y - 2 && clickedY < y + 18)
             {
-                if(is.getItem() instanceof NoteContainer nc)
+                if (is.getItem() instanceof NoteContainer nc)
                 {
                     Minecraft.getInstance().setScreen(new SecretNoteScreen(nc.note));
                 }
@@ -556,23 +556,35 @@ public class FishingGuideScreen extends Screen
                 {
                     List<Component> list = new ArrayList<>(List.of(Component.literal("Requirements:")));
 
-                    if(tp.all().total() != 0) list.add(Component.empty().append(Tooltips.decodeTranslationKey("gui.guide.trophy.all.total")).append("[" + all.total() + "/" + tp.all().total() + "]"));
-                    if(tp.all().unique() != 0) list.add(Component.empty().append(Tooltips.decodeTranslationKey("gui.guide.trophy.all.unique")).append("[" + all.unique() + "/" + tp.all().unique() + "]"));
+                    if (tp.all().total() != 0)
+                        list.add(Component.empty().append(Tooltips.decodeTranslationKey("gui.guide.trophy.all.total")).append("[" + all.total() + "/" + tp.all().total() + "]"));
+                    if (tp.all().unique() != 0)
+                        list.add(Component.empty().append(Tooltips.decodeTranslationKey("gui.guide.trophy.all.unique")).append("[" + all.unique() + "/" + tp.all().unique() + "]"));
 
-                    if(tp.common().total() != 0) list.add(Component.empty().append(Tooltips.decodeTranslationKey("gui.guide.trophy.common.total")).append("[" + common.total() + "/" + tp.common().total() + "]"));
-                    if(tp.common().unique() != 0) list.add(Component.empty().append(Tooltips.decodeTranslationKey("gui.guide.trophy.common.unique")).append("[" + common.unique() + "/" + tp.common().unique() + "]"));
+                    if (tp.common().total() != 0)
+                        list.add(Component.empty().append(Tooltips.decodeTranslationKey("gui.guide.trophy.common.total")).append("[" + common.total() + "/" + tp.common().total() + "]"));
+                    if (tp.common().unique() != 0)
+                        list.add(Component.empty().append(Tooltips.decodeTranslationKey("gui.guide.trophy.common.unique")).append("[" + common.unique() + "/" + tp.common().unique() + "]"));
 
-                    if(tp.uncommon().total() != 0) list.add(Component.empty().append(Tooltips.decodeTranslationKey("gui.guide.trophy.uncommon.total")).append("[" + uncommon.total() + "/" + tp.uncommon().total() + "]"));
-                    if(tp.uncommon().unique() != 0) list.add(Component.empty().append(Tooltips.decodeTranslationKey("gui.guide.trophy.uncommon.unique")).append("[" + uncommon.unique() + "/" + tp.uncommon().unique() + "]"));
+                    if (tp.uncommon().total() != 0)
+                        list.add(Component.empty().append(Tooltips.decodeTranslationKey("gui.guide.trophy.uncommon.total")).append("[" + uncommon.total() + "/" + tp.uncommon().total() + "]"));
+                    if (tp.uncommon().unique() != 0)
+                        list.add(Component.empty().append(Tooltips.decodeTranslationKey("gui.guide.trophy.uncommon.unique")).append("[" + uncommon.unique() + "/" + tp.uncommon().unique() + "]"));
 
-                    if(tp.rare().total() != 0) list.add(Component.empty().append(Tooltips.decodeTranslationKey("gui.guide.trophy.rare.total")).append("[" + rare.total() + "/" + tp.rare().total() + "]"));
-                    if(tp.rare().unique() != 0) list.add(Component.empty().append(Tooltips.decodeTranslationKey("gui.guide.trophy.rare.unique")).append("[" + rare.unique() + "/" + tp.rare().unique() + "]"));
+                    if (tp.rare().total() != 0)
+                        list.add(Component.empty().append(Tooltips.decodeTranslationKey("gui.guide.trophy.rare.total")).append("[" + rare.total() + "/" + tp.rare().total() + "]"));
+                    if (tp.rare().unique() != 0)
+                        list.add(Component.empty().append(Tooltips.decodeTranslationKey("gui.guide.trophy.rare.unique")).append("[" + rare.unique() + "/" + tp.rare().unique() + "]"));
 
-                    if(tp.epic().total() != 0) list.add(Component.empty().append(Tooltips.decodeTranslationKey("gui.guide.trophy.epic.total")).append("[" + epic.total() + "/" + tp.epic().total() + "]"));
-                    if(tp.epic().unique() != 0) list.add(Component.empty().append(Tooltips.decodeTranslationKey("gui.guide.trophy.epic.unique")).append("[" + epic.unique() + "/" + tp.epic().unique() + "]"));
+                    if (tp.epic().total() != 0)
+                        list.add(Component.empty().append(Tooltips.decodeTranslationKey("gui.guide.trophy.epic.total")).append("[" + epic.total() + "/" + tp.epic().total() + "]"));
+                    if (tp.epic().unique() != 0)
+                        list.add(Component.empty().append(Tooltips.decodeTranslationKey("gui.guide.trophy.epic.unique")).append("[" + epic.unique() + "/" + tp.epic().unique() + "]"));
 
-                    if(tp.legendary().total() != 0) list.add(Component.empty().append(Tooltips.decodeTranslationKey("gui.guide.trophy.legendary.total")).append("[" + legendary.total() + "/" + tp.legendary().total() + "]"));
-                    if(tp.legendary().unique() != 0) list.add(Component.empty().append(Tooltips.decodeTranslationKey("gui.guide.trophy.legendary.unique")).append("[" + legendary.unique() + "/" + tp.legendary().unique() + "]"));
+                    if (tp.legendary().total() != 0)
+                        list.add(Component.empty().append(Tooltips.decodeTranslationKey("gui.guide.trophy.legendary.total")).append("[" + legendary.total() + "/" + tp.legendary().total() + "]"));
+                    if (tp.legendary().unique() != 0)
+                        list.add(Component.empty().append(Tooltips.decodeTranslationKey("gui.guide.trophy.legendary.unique")).append("[" + legendary.unique() + "/" + tp.legendary().unique() + "]"));
 
                     guiGraphics.renderTooltip(this.font, list, Optional.empty(), mouseX, mouseY);
                 }
@@ -1179,7 +1191,18 @@ public class FishingGuideScreen extends Screen
                     if (x > xOffset && x < xOffset + 100 && y > yOffset - 2 && y < yOffset + 10)
                     {
                         List<Component> c = new ArrayList<>();
-                        c.add(Component.translatable("gui.guide.biomes"));
+
+                        if (!fp.wr().biomesTags().isEmpty())
+                        {
+                            c.add(Component.translatable("gui.guide.biome_tags").withStyle(Style.EMPTY.withBold(true)));
+
+                            for (ResourceLocation rl : fp.wr().biomesTags())
+                                c.add(Component.translatable("tag." + rl.toLanguageKey()));
+                            c.add(Component.empty());
+                        }
+
+
+                        c.add(Component.translatable("gui.guide.biomes").withStyle(Style.EMPTY.withBold(true)));
 
                         for (ResourceLocation rl : biomes)
                         {
@@ -1209,24 +1232,19 @@ public class FishingGuideScreen extends Screen
                 }
             }
 
-            if (biomes.isEmpty())
-            {
-                comp = comp.copy().withStyle(Style.EMPTY.withColor(0x00AA00));
-            }
-            else
-            {
+            ResourceLocation rl = getBiomeRL(level.getBiome(Minecraft.getInstance().player.blockPosition()));
 
-                ResourceLocation rl = getBiomeRL(level.getBiome(Minecraft.getInstance().player.blockPosition()));
-                if (biomes.contains(rl))
-                {
-                    comp = comp.copy().withStyle(Style.EMPTY.withColor(0x00AA00));
-                }
-                else
-                {
-                    comp = comp.copy().withStyle(Style.EMPTY.withColor(0xAA0000));
-                }
+            comp = comp.copy().withStyle(Style.EMPTY.withColor(0x00AA00));
+
+            if (!biomes.contains(rl) && !biomes.isEmpty())
+            {
+                comp = comp.copy().withStyle(Style.EMPTY.withColor(0xAA0000));
             }
 
+            if (biomesBL.contains(rl))
+            {
+                comp = comp.copy().withStyle(Style.EMPTY.withColor(0xAA0000));
+            }
 
             Component start = Component.translatable("gui.guide.biome");
 
@@ -1244,7 +1262,17 @@ public class FishingGuideScreen extends Screen
                 {
                     List<Component> c = new ArrayList<>();
 
-                    c.add(Component.translatable("gui.guide.blacklisted_biomes"));
+                    if (!fp.wr().biomesBlacklistTags().isEmpty())
+                    {
+                        c.add(Component.translatable("gui.guide.blacklisted_biome_tags").withStyle(Style.EMPTY.withBold(true)));
+
+                        for (ResourceLocation rl : fp.wr().biomesBlacklistTags())
+                            c.add(Component.translatable("tag." + rl.toLanguageKey()));
+                        c.add(Component.empty());
+                    }
+
+
+                    c.add(Component.translatable("gui.guide.blacklisted_biomes").withStyle(Style.EMPTY.withBold(true)));
 
                     for (ResourceLocation rl : biomesBL)
                         c.add(Component.translatable("biome." + rl.toLanguageKey()));
@@ -1254,7 +1282,7 @@ public class FishingGuideScreen extends Screen
             }
         }
 
-
+        //bait
         if (!fp.br().correctBait().isEmpty())
         {
             yOffset += 15;
@@ -1553,7 +1581,7 @@ public class FishingGuideScreen extends Screen
         {
             ResourceLocation rl = fishProperties.getKey(fp);
 
-            if(rl == null) rl = Starcatcher.rl("missingno");
+            if (rl == null) rl = Starcatcher.rl("missingno");
 
             notifRLs.add(rl);
         }

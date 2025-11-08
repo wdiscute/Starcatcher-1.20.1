@@ -3,6 +3,7 @@ package com.wdiscute.starcatcher.rod;
 import com.wdiscute.starcatcher.ModItems;
 import com.wdiscute.starcatcher.bob.FishingBobEntity;
 import com.wdiscute.starcatcher.networkandcodecs.DataAttachments;
+import com.wdiscute.starcatcher.networkandcodecs.ModDataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -31,6 +32,8 @@ public class StarcatcherFishingRod extends Item implements MenuProvider
                 .rarity(Rarity.EPIC)
                 .stacksTo(1)
         );
+
+
     }
 
     //comment - kuko010
@@ -41,11 +44,15 @@ public class StarcatcherFishingRod extends Item implements MenuProvider
 
         if (player.isCrouching())
         {
+            ItemStack is = player.getItemInHand(hand);
+
+            if(!is.hasTag())
+            {
+                ModDataComponents.setItemInSlot(is, ModDataComponents.Slots.HOOK, new ItemStack(ModItems.HOOK.get()));
+            }
             player.openMenu(this);
             return InteractionResultHolder.success(player.getItemInHand(hand));
         }
-
-        var wad = DataAttachments.get(player);
 
         if (level.isClientSide) return InteractionResultHolder.success(player.getItemInHand(hand));
 

@@ -37,6 +37,8 @@ public class FishingRodMenu extends AbstractContainerMenu
     {
         super(ModMenuTypes.FISHING_ROD_MENU.get(), containerId);
 
+        System.out.println(inv.player.level() + "    " + itemStack);
+
         is = itemStack;
 
         //player inventory
@@ -121,6 +123,13 @@ public class FishingRodMenu extends AbstractContainerMenu
 //            is.set(ModDataComponents.BAIT.get(), new SingleStackContainer(inventory.getStackInSlot(1)));
 //            is.set(ModDataComponents.HOOK.get(), new SingleStackContainer(inventory.getStackInSlot(2)));
         }
+
+        System.out.println("wadaw");
+        System.out.println("wadaw");
+
+
+        System.out.println(is);
+        System.out.println("wadaw");
 
     }
 

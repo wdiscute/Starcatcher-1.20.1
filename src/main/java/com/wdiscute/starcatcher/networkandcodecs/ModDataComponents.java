@@ -1,19 +1,14 @@
 package com.wdiscute.starcatcher.networkandcodecs;
 
-import com.mojang.datafixers.util.Pair;
 import com.mojang.logging.LogUtils;
 import com.mojang.serialization.DataResult;
 import com.wdiscute.starcatcher.items.ColorfulBobber;
 import com.wdiscute.starcatcher.secretnotes.SecretNote;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.Tag;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.ItemStack;
 import org.slf4j.Logger;
-
-import java.util.Optional;
 
 public class ModDataComponents
 {
@@ -23,7 +18,7 @@ public class ModDataComponents
     {
         BOBBER("bobber"),
         BAIT("bait"),
-        HOOK("noon");
+        HOOK("hook");
 
         private final String key;
 
@@ -39,11 +34,6 @@ public class ModDataComponents
     }
 
 
-
-
-
-
-
     //secret note data component
     public static void setSecretNote(ItemStack is, SecretNote.Note note)
     {
@@ -54,14 +44,6 @@ public class ModDataComponents
     {
         return SecretNote.Note.getBySerializedName(is.getTag().getString("secret_note"));
     }
-
-
-
-
-
-
-
-
 
 
     //fish properties data component
@@ -84,10 +66,6 @@ public class ModDataComponents
     }
 
 
-
-
-
-
     //trophy properties data component
     public static TrophyProperties getTrophyProperties(ItemStack is)
     {
@@ -108,10 +86,6 @@ public class ModDataComponents
         TrophyProperties.CODEC.encode(tp, NbtOps.INSTANCE, new CompoundTag())
                 .resultOrPartial(LOGGER::warn).ifPresent(tag -> is.getOrCreateTag().put("trophy_properties", tag));
     }
-
-
-
-
 
 
     //bobber color data component
@@ -140,19 +114,12 @@ public class ModDataComponents
     }
 
 
-
-
-
-
     //bobber, bait, hook data component
     public static void setItemInSlot(ItemStack is, Slots slotToSave, ItemStack stackToSave)
     {
-        if (!stackToSave.isEmpty())
-        {
-            CompoundTag tag = new CompoundTag();
-            stackToSave.save(tag);
-            is.getOrCreateTag().put(slotToSave.getSerializedName(), tag);
-        }
+        CompoundTag tag = new CompoundTag();
+        stackToSave.save(tag);
+        is.getOrCreateTag().put(slotToSave.getSerializedName(), tag);
     }
 
     public static ItemStack getItemInSlot(ItemStack is, Slots slotToGet)

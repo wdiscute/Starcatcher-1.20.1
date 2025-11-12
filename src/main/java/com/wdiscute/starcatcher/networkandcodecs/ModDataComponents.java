@@ -49,9 +49,11 @@ public class ModDataComponents
     //fish properties data component
     public static FishProperties getFishProperties(ItemStack is)
     {
-        if (is.getOrCreateTag().contains("fish_properties"))
-            return FishProperties.CODEC.decode(NbtOps.INSTANCE, is.getTag().get("fish_properties")).result().get().getFirst();
-
+        if (is.hasTag())
+        {
+            if (is.getOrCreateTag().contains("fish_properties"))
+                return FishProperties.CODEC.decode(NbtOps.INSTANCE, is.getTag().get("fish_properties")).result().get().getFirst();
+        }
         return FishProperties.DEFAULT;
     }
 
@@ -69,13 +71,17 @@ public class ModDataComponents
     //trophy properties data component
     public static TrophyProperties getTrophyProperties(ItemStack is)
     {
-        if (is.getOrCreateTag().contains("trophy_properties"))
+        if (is.hasTag())
         {
-            CompoundTag trophyProperties = is.getOrCreateTag().getCompound("trophy_properties");
+            if (is.getTag().contains("trophy_properties"))
+            {
 
-            DataResult<TrophyProperties> decode = TrophyProperties.CODEC.parse(NbtOps.INSTANCE, trophyProperties);
+                CompoundTag trophyProperties = is.getOrCreateTag().getCompound("trophy_properties");
 
-            return decode.result().orElse(TrophyProperties.DEFAULT);
+                DataResult<TrophyProperties> decode = TrophyProperties.CODEC.parse(NbtOps.INSTANCE, trophyProperties);
+
+                return decode.result().orElse(TrophyProperties.DEFAULT);
+            }
         }
 
         return TrophyProperties.DEFAULT;

@@ -1,9 +1,12 @@
 {
-  "above_y": 0,
-  "below_y": 50,
   "difficulty": {
-    "has_first_thin_marker": true,
-    "has_second_marker": false,
+    "extras": {
+      "has_moving_markers": true
+    },
+    "markers": {
+      "has_first_thin_marker": true,
+      "has_second_marker": false
+    },
     "penalty": 15,
     "reward": 15,
     "reward_thin": 35,
@@ -15,7 +18,20 @@
     }
   },
   "fish": "starcatcher:stonefish",
+  "size_and_weight": {
+    "average_size_cm": 300.0,
+    "average_weight_grams": 26000.0,
+    "deviation_size_cm": 150.0,
+    "deviation_weight_grams": 7000.0,
+    "golden_chance_percentage": 10,
+    "golden_state_increase": 20
+  },
   "world_restrictions": {
+    "above_y": 0,
+    "below_y": 50,
+    "biomes": [
+      "minecraft:lush_caves"
+    ],
     "dimensions": [
       "minecraft:overworld"
     ]

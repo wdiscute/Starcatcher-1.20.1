@@ -1,7 +1,7 @@
 {
-  "forge:conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:mod_loaded",
+      "type": "neoforge:mod_loaded",
       "modid": "tide"
     }
   ],
@@ -11,11 +11,15 @@
       "starcatcher:sculk_bait"
     ]
   },
-  "below_y": 50,
   "difficulty": {
     "decay": 2,
-    "has_first_thin_marker": true,
-    "has_second_marker": false,
+    "extras": {
+      "has_vanishing_markers": true
+    },
+    "markers": {
+      "has_first_thin_marker": true,
+      "has_second_marker": false
+    },
     "penalty": 25,
     "reward": 15,
     "reward_thin": 35,
@@ -29,6 +33,7 @@
   "fish": "tide:echofin_snapper",
   "rarity": "rare",
   "world_restrictions": {
+    "below_y": 50,
     "biomes": [
       "minecraft:deep_dark"
     ],

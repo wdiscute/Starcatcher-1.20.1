@@ -1,8 +1,10 @@
 {
   "difficulty": {
     "decay": 2,
-    "has_first_thin_marker": true,
-    "has_second_marker": false,
+    "markers": {
+      "has_first_thin_marker": true,
+      "has_second_marker": false
+    },
     "penalty": 25,
     "reward": 15,
     "reward_thin": 35,
@@ -15,6 +17,14 @@
   },
   "fish": "starcatcher:magma_fish",
   "rarity": "uncommon",
+  "size_and_weight": {
+    "average_size_cm": 120.0,
+    "average_weight_grams": 3700.0,
+    "deviation_size_cm": 40.0,
+    "deviation_weight_grams": 900.0,
+    "golden_chance_percentage": 10,
+    "golden_state_increase": 20
+  },
   "world_restrictions": {
     "dimensions": [
       "minecraft:the_nether"

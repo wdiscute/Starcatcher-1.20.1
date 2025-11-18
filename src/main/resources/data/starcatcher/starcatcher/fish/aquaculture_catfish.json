@@ -1,18 +1,18 @@
 {
-  "forge:conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:mod_loaded",
+      "type": "neoforge:mod_loaded",
       "modid": "aquaculture"
     }
   ],
-  "above_y": 100,
   "difficulty": {
-    "change_rotation_every_hit": false,
     "decay": 0,
-    "has_first_marker": false,
-    "has_first_thin_marker": true,
-    "has_second_marker": false,
-    "has_second_thin_marker": true,
+    "markers": {
+      "has_first_marker": false,
+      "has_first_thin_marker": true,
+      "has_second_marker": false,
+      "has_second_thin_marker": true
+    },
     "penalty": 999,
     "reward": 0,
     "reward_thin": 15,
@@ -26,6 +26,8 @@
   "rarity": "epic",
   "weather": "rain",
   "world_restrictions": {
+    "above_y": 100,
+    "below_y": 100,
     "biomes_blacklist_tags": [
       "starcatcher:is_ocean",
       "starcatcher:is_river"

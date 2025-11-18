@@ -1,7 +1,9 @@
 {
   "difficulty": {
-    "has_first_thin_marker": true,
-    "has_second_marker": false,
+    "markers": {
+      "has_first_thin_marker": true,
+      "has_second_marker": false
+    },
     "penalty": 15,
     "reward": 15,
     "reward_thin": 35,
@@ -13,6 +15,14 @@
     }
   },
   "fish": "starcatcher:glowstone_pufferfish",
+  "size_and_weight": {
+    "average_size_cm": 35.0,
+    "average_weight_grams": 1000.0,
+    "deviation_size_cm": 25.0,
+    "deviation_weight_grams": 700.0,
+    "golden_chance_percentage": 10,
+    "golden_state_increase": 20
+  },
   "world_restrictions": {
     "dimensions": [
       "minecraft:the_nether"

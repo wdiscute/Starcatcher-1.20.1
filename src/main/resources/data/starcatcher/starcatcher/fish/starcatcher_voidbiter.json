@@ -1,14 +1,15 @@
 {
   "bait_restrictions": {
-    "correct_bait_chance_added": 15,
+    "correct_bait_chance_added": 50,
     "correct_baits": [
       "starcatcher:legendary_bait"
     ]
   },
   "difficulty": {
-    "decay": 0,
+    "decay": 2,
     "extras": {
-      "has_moving_markers": true
+      "has_moving_markers": true,
+      "has_vanishing_markers": true
     },
     "markers": {
       "has_first_marker": false,
@@ -16,32 +17,35 @@
       "has_second_marker": false,
       "has_second_thin_marker": true
     },
-    "penalty": 999,
+    "penalty": 20,
     "reward": 0,
-    "reward_thin": 15,
+    "reward_thin": 10,
+    "speed": 12,
     "treasure": {
       "has_treasure": true,
       "hit_reward": 15,
       "loot": "starcatcher:treasure"
     }
   },
-  "fish": "starcatcher:shroomfish",
-  "rarity": "legendary",
+  "fish": "starcatcher:voidbiter",
+  "rarity": "epic",
   "size_and_weight": {
-    "average_size_cm": 70.0,
-    "average_weight_grams": 4000.0,
-    "deviation_size_cm": 50.0,
-    "deviation_weight_grams": 2000.0,
+    "average_size_cm": 50.0,
+    "average_weight_grams": 2000.0,
+    "deviation_size_cm": 15.0,
+    "deviation_weight_grams": 200.0,
     "golden_chance_percentage": 10,
     "golden_state_increase": 20
   },
   "world_restrictions": {
-    "above_y": 50,
+    "biomes_blacklist": [
+      "minecraft:the_end"
+    ],
     "biomes_tags": [
-      "starcatcher:is_mushroom_fields"
+      "minecraft:is_end"
     ],
     "dimensions": [
-      "minecraft:overworld"
+      "minecraft:the_end"
     ]
   }
 }

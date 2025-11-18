@@ -1,5 +1,4 @@
 {
-  "above_y": 50,
   "bait_restrictions": {
     "correct_bait_chance_added": 15,
     "correct_baits": [
@@ -7,12 +6,15 @@
     ]
   },
   "base_chance": 1,
-  "below_y": 100,
   "difficulty": {
-    "change_rotation_every_hit": false,
     "decay": 3,
-    "has_first_thin_marker": true,
-    "has_second_thin_marker": true,
+    "extras": {
+      "flips_rotation_every_hit": false
+    },
+    "markers": {
+      "has_first_thin_marker": true,
+      "has_second_thin_marker": true
+    },
     "penalty": 15,
     "reward": 15,
     "reward_thin": 30,
@@ -25,7 +27,17 @@
   },
   "fish": "starcatcher:joel",
   "rarity": "legendary",
+  "size_and_weight": {
+    "average_size_cm": 69.0,
+    "average_weight_grams": 2000.0,
+    "deviation_size_cm": 0.0,
+    "deviation_weight_grams": 600.0,
+    "golden_chance_percentage": 10,
+    "golden_state_increase": 0
+  },
   "world_restrictions": {
+    "above_y": 50,
+    "below_y": 100,
     "biomes_tags": [
       "starcatcher:is_ocean"
     ],

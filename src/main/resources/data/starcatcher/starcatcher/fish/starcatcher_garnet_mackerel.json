@@ -1,9 +1,13 @@
 {
-  "below_y": 0,
   "difficulty": {
     "decay": 2,
-    "has_first_thin_marker": true,
-    "has_second_marker": false,
+    "extras": {
+      "has_vanishing_markers": true
+    },
+    "markers": {
+      "has_first_thin_marker": true,
+      "has_second_marker": false
+    },
     "penalty": 25,
     "reward": 15,
     "reward_thin": 35,
@@ -16,7 +20,16 @@
   },
   "fish": "starcatcher:garnet_mackerel",
   "rarity": "uncommon",
+  "size_and_weight": {
+    "average_size_cm": 40.0,
+    "average_weight_grams": 2000.0,
+    "deviation_size_cm": 20.0,
+    "deviation_weight_grams": 1500.0,
+    "golden_chance_percentage": 10,
+    "golden_state_increase": 20
+  },
   "world_restrictions": {
+    "below_y": 0,
     "dimensions": [
       "minecraft:overworld"
     ]

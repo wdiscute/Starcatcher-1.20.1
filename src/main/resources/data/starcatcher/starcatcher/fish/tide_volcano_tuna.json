@@ -1,15 +1,19 @@
 {
-  "forge:conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:mod_loaded",
+      "type": "neoforge:mod_loaded",
       "modid": "tide"
     }
   ],
-  "above_y": 50,
   "difficulty": {
     "decay": 2,
-    "has_first_thin_marker": true,
-    "has_second_marker": false,
+    "extras": {
+      "has_moving_markers": true
+    },
+    "markers": {
+      "has_first_thin_marker": true,
+      "has_second_marker": false
+    },
     "penalty": 25,
     "reward": 15,
     "reward_thin": 35,
@@ -23,6 +27,7 @@
   "fish": "tide:volcano_tuna",
   "rarity": "rare",
   "world_restrictions": {
+    "above_y": 50,
     "dimensions": [
       "minecraft:overworld"
     ],

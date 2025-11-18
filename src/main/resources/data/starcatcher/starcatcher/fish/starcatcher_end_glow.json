@@ -1,19 +1,34 @@
 {
   "difficulty": {
-    "has_first_thin_marker": true,
-    "has_second_marker": false,
-    "penalty": 15,
-    "reward": 15,
-    "reward_thin": 35,
-    "speed": 10,
+    "decay": 0,
+    "extras": {
+      "has_moving_markers": true
+    },
+    "markers": {
+      "has_first_marker": false,
+      "has_first_thin_marker": true,
+      "has_second_marker": false,
+      "has_second_thin_marker": true
+    },
+    "penalty": 30,
+    "reward": 0,
+    "reward_thin": 15,
     "treasure": {
       "has_treasure": true,
       "hit_reward": 15,
-      "loot": "starcatcher:waterlogged_satchel"
+      "loot": "starcatcher:treasure"
     }
   },
   "fish": "starcatcher:end_glow",
   "rarity": "uncommon",
+  "size_and_weight": {
+    "average_size_cm": 235.0,
+    "average_weight_grams": 7000.0,
+    "deviation_size_cm": 25.0,
+    "deviation_weight_grams": 700.0,
+    "golden_chance_percentage": 10,
+    "golden_state_increase": 20
+  },
   "world_restrictions": {
     "dimensions": [
       "minecraft:the_end"

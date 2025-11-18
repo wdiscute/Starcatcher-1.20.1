@@ -1,16 +1,16 @@
 {
-  "forge:conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:mod_loaded",
+      "type": "neoforge:mod_loaded",
       "modid": "fishofthieves"
     }
   ],
-  "above_y": 50,
   "base_chance": 2,
-  "below_y": 100,
   "difficulty": {
-    "has_first_thin_marker": true,
-    "has_second_marker": false,
+    "markers": {
+      "has_first_thin_marker": true,
+      "has_second_marker": false
+    },
     "penalty": 15,
     "reward": 15,
     "reward_thin": 35,
@@ -24,6 +24,8 @@
   "fish": "fishofthieves:pondie",
   "rarity": "uncommon",
   "world_restrictions": {
+    "above_y": 50,
+    "below_y": 100,
     "biomes_blacklist_tags": [
       "starcatcher:is_ocean",
       "starcatcher:is_river"

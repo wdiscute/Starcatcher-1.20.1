@@ -1,10 +1,14 @@
 {
   "base_chance": 1,
-  "below_y": 50,
   "difficulty": {
     "decay": 2,
-    "has_first_thin_marker": true,
-    "has_second_marker": false,
+    "extras": {
+      "has_vanishing_markers": true
+    },
+    "markers": {
+      "has_first_thin_marker": true,
+      "has_second_marker": false
+    },
     "penalty": 25,
     "reward": 15,
     "reward_thin": 35,
@@ -17,7 +21,16 @@
   },
   "fish": "starcatcher:geode_eel",
   "rarity": "epic",
+  "size_and_weight": {
+    "average_size_cm": 500.0,
+    "average_weight_grams": 10000.0,
+    "deviation_size_cm": 150.0,
+    "deviation_weight_grams": 2000.0,
+    "golden_chance_percentage": 10,
+    "golden_state_increase": 20
+  },
   "world_restrictions": {
+    "below_y": 50,
     "dimensions": [
       "minecraft:overworld"
     ]

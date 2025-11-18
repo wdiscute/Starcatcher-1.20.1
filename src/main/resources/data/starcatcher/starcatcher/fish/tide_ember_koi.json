@@ -1,16 +1,19 @@
 {
-  "forge:conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:mod_loaded",
+      "type": "neoforge:mod_loaded",
       "modid": "tide"
     }
   ],
-  "above_y": 50,
   "difficulty": {
-    "change_rotation_every_hit": false,
     "decay": 3,
-    "has_first_thin_marker": true,
-    "has_second_thin_marker": true,
+    "extras": {
+      "flips_rotation_every_hit": false
+    },
+    "markers": {
+      "has_first_thin_marker": true,
+      "has_second_thin_marker": true
+    },
     "penalty": 15,
     "reward": 15,
     "reward_thin": 30,
@@ -24,6 +27,7 @@
   "fish": "tide:ember_koi",
   "rarity": "epic",
   "world_restrictions": {
+    "above_y": 50,
     "dimensions": [
       "minecraft:overworld"
     ],

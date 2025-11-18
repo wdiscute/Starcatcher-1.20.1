@@ -1,11 +1,7 @@
 {
-  "all": {
-    "total": 6,
-    "unique": 15
-  },
   "custom_name": "",
   "fish_properties": {
-    "fish": "starcatcher:crystal_hook",
+    "fish": "minecraft:diamond",
     "world_restrictions": {
       "below_y": 0,
       "dimensions": [
@@ -13,7 +9,8 @@
       ]
     }
   },
-  "legendary": {
-    "total": 1
+  "rare": {
+    "total": 1,
+    "unique": 4
   }
 }

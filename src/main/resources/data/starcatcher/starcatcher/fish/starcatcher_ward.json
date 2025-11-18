@@ -6,13 +6,17 @@
     ]
   },
   "base_chance": 2,
-  "below_y": 50,
   "difficulty": {
-    "change_rotation_every_hit": false,
-    "decay": 10,
-    "penalty": 0,
-    "reward": 18,
-    "reward_thin": 30,
+    "decay": 0,
+    "extras": {
+      "flips_rotation_every_hit": false,
+      "has_vanishing_markers": true
+    },
+    "markers": {
+      "has_second_marker": false
+    },
+    "penalty": 15,
+    "reward": 5,
     "speed": 15,
     "treasure": {
       "has_treasure": true,
@@ -22,7 +26,16 @@
   },
   "fish": "starcatcher:ward",
   "rarity": "legendary",
+  "size_and_weight": {
+    "average_size_cm": 50.0,
+    "average_weight_grams": 2600.0,
+    "deviation_size_cm": 10.0,
+    "deviation_weight_grams": 600.0,
+    "golden_chance_percentage": 10,
+    "golden_state_increase": 20
+  },
   "world_restrictions": {
+    "below_y": 50,
     "biomes": [
       "minecraft:deep_dark"
     ],

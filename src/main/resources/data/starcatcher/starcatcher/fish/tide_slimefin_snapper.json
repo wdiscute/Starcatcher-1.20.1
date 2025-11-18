@@ -1,11 +1,10 @@
 {
-  "forge:conditions": [
+  "neoforge:conditions": [
     {
-      "type": "forge:mod_loaded",
+      "type": "neoforge:mod_loaded",
       "modid": "tide"
     }
   ],
-  "above_y": 50,
   "bait_restrictions": {
     "correct_bait_chance_added": 15,
     "correct_baits": [
@@ -13,9 +12,13 @@
     ]
   },
   "difficulty": {
-    "change_rotation_every_hit": false,
     "decay": 2,
-    "has_second_marker": false,
+    "extras": {
+      "flips_rotation_every_hit": false
+    },
+    "markers": {
+      "has_second_marker": false
+    },
     "penalty": 15,
     "reward": 5,
     "speed": 15,
@@ -28,6 +31,7 @@
   "fish": "tide:slimefin_snapper",
   "rarity": "rare",
   "world_restrictions": {
+    "above_y": 50,
     "biomes_tags": [
       "starcatcher:is_swamp"
     ],

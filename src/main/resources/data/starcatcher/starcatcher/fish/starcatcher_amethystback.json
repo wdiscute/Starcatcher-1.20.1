@@ -1,10 +1,12 @@
 {
-  "above_y": -40,
-  "below_y": -20,
   "difficulty": {
-    "change_rotation_every_hit": false,
     "decay": 2,
-    "has_second_marker": false,
+    "extras": {
+      "flips_rotation_every_hit": false
+    },
+    "markers": {
+      "has_second_marker": false
+    },
     "penalty": 15,
     "reward": 5,
     "speed": 15,
@@ -16,7 +18,20 @@
   },
   "fish": "starcatcher:amethystback",
   "rarity": "epic",
+  "size_and_weight": {
+    "average_size_cm": 300.0,
+    "average_weight_grams": 16000.0,
+    "deviation_size_cm": 150.0,
+    "deviation_weight_grams": 7000.0,
+    "golden_chance_percentage": 10,
+    "golden_state_increase": 20
+  },
   "world_restrictions": {
+    "above_y": -40,
+    "below_y": -20,
+    "biomes": [
+      "minecraft:lush_caves"
+    ],
     "dimensions": [
       "minecraft:overworld"
     ]

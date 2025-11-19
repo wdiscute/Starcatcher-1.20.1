@@ -26,7 +26,7 @@ public class RevokeAllFishes extends Item
         if(!(level instanceof ServerLevel)) return InteractionResultHolder.success(player.getItemInHand(usedHand));
 
         //reset fishes caught
-        DataAttachments.get(player).setFishesCaught(List.of(FishCaughtCounter.DEFAULT));
+        DataAttachments.get(player).setFishesCaught(List.of(new FishCaughtCounter(FishProperties.DEFAULT, 0, 0,0,0,0, false)));
         DataAttachments.get(player).setFishNotifications(List.of(FishProperties.DEFAULT));
         return InteractionResultHolder.success(player.getItemInHand(usedHand));
     }

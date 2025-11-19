@@ -3,13 +3,13 @@ package com.wdiscute.starcatcher.bob;
 import com.wdiscute.starcatcher.*;
 import com.wdiscute.starcatcher.networkandcodecs.*;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -36,6 +36,7 @@ public class FishingBobEntity extends Projectile
 
 
     public static final EntityDataAccessor<Integer> STATE = SynchedEntityData.defineId(FishingBobEntity.class, EntityDataSerializers.INT);
+    public static final EntityDataAccessor<ItemStack> BOBBER = SynchedEntityData.defineId(FishingBobEntity.class, EntityDataSerializers.ITEM_STACK);
 
 
     public final Player player;
@@ -75,10 +76,9 @@ public class FishingBobEntity extends Projectile
         this.player = player;
         this.rod = rod;
 
-
-        this.bobber = ModDataComponents.getItemInSlot(rod, ModDataComponents.Slots.BOBBER);
-        this.bait = ModDataComponents.getItemInSlot(rod, ModDataComponents.Slots.BAIT);
-        this.hook = ModDataComponents.getItemInSlot(rod, ModDataComponents.Slots.HOOK);
+        this.bobber = DataComponents.getItemInSlot(rod, DataComponents.Slots.BOBBER);
+        this.bait = DataComponents.getItemInSlot(rod, DataComponents.Slots.BAIT);
+        this.hook = DataComponents.getItemInSlot(rod, DataComponents.Slots.HOOK);
 
         {
             this.setOwner(player);
@@ -169,14 +169,14 @@ public class FishingBobEntity extends Projectile
             {
 
                 ItemStack is = new ItemStack(tp.fp().fish());
-                ModDataComponents.setTrophyProperties(is, tp);
+                DataComponents.setTrophyProperties(is, tp);
                 //is.set(ModDataComponents.TROPHY, tp);
                 if (!tp.customName().isEmpty())
                 {
                     is.setHoverName(Component.literal(tp.customName()));
                 }
-                    //1.20 fix
-                    //is.set(DataComponents.ITEM_NAME, Component.literal(tp.customName()));
+                //1.20 fix
+                //is.set(DataComponents.ITEM_NAME, Component.literal(tp.customName()));
 
                 Entity itemFished = new ItemEntity(
                         level(), position().x, position().y + 1.2f, position().z,
@@ -263,7 +263,7 @@ public class FishingBobEntity extends Projectile
         else
         {
 
-            if(player instanceof ServerPlayer sp)
+            if (player instanceof ServerPlayer sp)
             {
                 Payloads.CHANNEL.send(
                         PacketDistributor.PLAYER.with(() -> sp),
@@ -290,7 +290,7 @@ public class FishingBobEntity extends Projectile
                 bait.setCount(bait.getCount() - 1);
             }
 
-            ModDataComponents.setItemInSlot(rod, ModDataComponents.Slots.BAIT, bait);
+            DataComponents.setItemInSlot(rod, DataComponents.Slots.BAIT, bait);
             //1.20 fix
             //rod.set(ModDataComponents.BAIT, new SingleStackContainer(bait));
         }
@@ -346,6 +346,7 @@ public class FishingBobEntity extends Projectile
             if (currentState == FishHookState.BOBBING) entityData.set(STATE, 2);
             if (currentState == FishHookState.BITING) entityData.set(STATE, 3);
             if (currentState == FishHookState.FISHING) entityData.set(STATE, 4);
+            entityData.set(BOBBER, bobber);
         }
         else
         {
@@ -353,6 +354,7 @@ public class FishingBobEntity extends Projectile
             if (entityData.get(STATE) == 2) currentState = FishHookState.BOBBING;
             if (entityData.get(STATE) == 3) currentState = FishHookState.BITING;
             if (entityData.get(STATE) == 4) currentState = FishHookState.FISHING;
+            bobber = entityData.get(BOBBER);
         }
 
         Player player = ((Player) this.getOwner());
@@ -474,6 +476,8 @@ public class FishingBobEntity extends Projectile
 
                 this.setPos(position().x, position().y - 0.5f, position().z);
                 if (!level().isClientSide) currentState = FishHookState.BITING;
+                this.playSound(SoundEvents.FISHING_BOBBER_SPLASH, 0.25F, 1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.4F);
+
             }
         }
 
@@ -490,6 +494,7 @@ public class FishingBobEntity extends Projectile
     protected void defineSynchedData()
     {
         this.entityData.define(STATE, 0);
+        this.entityData.define(BOBBER, ItemStack.EMPTY);
     }
 
     public static boolean check(TrophyProperties.RarityProgress current, TrophyProperties.RarityProgress restriction)

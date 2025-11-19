@@ -3,10 +3,7 @@ package com.wdiscute.starcatcher.networkandcodecs;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.wdiscute.starcatcher.ModItems;
-import net.minecraft.core.Holder;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.util.StringRepresentable;
-import net.minecraft.world.item.Items;
 
 import java.util.List;
 
@@ -40,7 +37,7 @@ public record TrophyProperties
 
     public static final Codec<TrophyProperties> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
-                    FishProperties.CODEC.fieldOf("fish_properties").forGetter(TrophyProperties::fp),
+                    FishProperties.CODEC.optionalFieldOf("fish_properties", DEFAULT.fp).forGetter(TrophyProperties::fp),
                     TrophyType.CODEC.optionalFieldOf("trophy_type", DEFAULT.trophyType).forGetter(TrophyProperties::trophyType),
                     Codec.STRING.optionalFieldOf("custom_name", DEFAULT.customName).forGetter(TrophyProperties::customName),
                     RarityProgress.CODEC.optionalFieldOf("all", DEFAULT.common).forGetter(TrophyProperties::all),
@@ -53,22 +50,6 @@ public record TrophyProperties
             ).apply(instance, TrophyProperties::new)
     );
 
-//    public static final StreamCodec<RegistryFriendlyByteBuf, TrophyProperties> STREAM_CODEC = FishProperties.composite(
-//            FishProperties.STREAM_CODEC, TrophyProperties::fp,
-//            TrophyType.STREAM_CODEC, TrophyProperties::trophyType,
-//            ByteBufCodecs.STRING_UTF8, TrophyProperties::customName,
-//            RarityProgress.STREAM_CODEC, TrophyProperties::all,
-//            RarityProgress.STREAM_CODEC, TrophyProperties::common,
-//            RarityProgress.STREAM_CODEC, TrophyProperties::uncommon,
-//            RarityProgress.STREAM_CODEC, TrophyProperties::rare,
-//            RarityProgress.STREAM_CODEC, TrophyProperties::epic,
-//            RarityProgress.STREAM_CODEC, TrophyProperties::legendary,
-//            ByteBufCodecs.VAR_INT, TrophyProperties::chanceToCatch,
-//            TrophyProperties::new
-//    );
-
-    //public static final StreamCodec<RegistryFriendlyByteBuf, List<TrophyProperties>> LIST_STREAM_CODEC = STREAM_CODEC.apply(ByteBufCodecs.list());
-
     public static final Codec<List<TrophyProperties>> LIST_CODEC = TrophyProperties.CODEC.listOf();
 
     public record RarityProgress(int total, int unique)
@@ -78,12 +59,6 @@ public record TrophyProperties
                                 Codec.INT.optionalFieldOf("total", 0).forGetter(RarityProgress::total),
                                 Codec.INT.optionalFieldOf("unique", 0).forGetter(RarityProgress::unique)
                         ).apply(instance, RarityProgress::new));
-
-//        public static final StreamCodec<RegistryFriendlyByteBuf, RarityProgress> STREAM_CODEC = StreamCodec.composite(
-//                ByteBufCodecs.VAR_INT, RarityProgress::total,
-//                ByteBufCodecs.VAR_INT, RarityProgress::unique,
-//                RarityProgress::new
-//        );
 
         public static final RarityProgress DEFAULT = new RarityProgress(0, 0);
     }
@@ -95,7 +70,6 @@ public record TrophyProperties
         EXTRA("extra");
 
         public static final Codec<TrophyType> CODEC = StringRepresentable.fromEnum(TrophyType::values);
-        //public static final StreamCodec<FriendlyByteBuf, TrophyType> STREAM_CODEC = NeoForgeStreamCodecs.enumCodec(TrophyType.class);
         private final String key;
 
         TrophyType(String key)

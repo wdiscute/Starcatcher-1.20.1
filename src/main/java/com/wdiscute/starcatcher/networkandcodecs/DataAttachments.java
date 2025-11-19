@@ -23,7 +23,7 @@ public class DataAttachments implements DataAttachmentCapability, INBTSerializab
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public String fishing = "";
-    public List<FishCaughtCounter> fishesCaught = List.of(new FishCaughtCounter(FishProperties.DEFAULT, 0, 0, 0));
+    public List<FishCaughtCounter> fishesCaught = List.of(new FishCaughtCounter(FishProperties.DEFAULT, 0, 0, 0, 0, 0, false));
     public List<TrophyProperties> trophiesCaught = List.of(TrophyProperties.DEFAULT);
     public List<FishProperties> notifications = List.of(FishProperties.DEFAULT);
 
@@ -78,7 +78,13 @@ public class DataAttachments implements DataAttachmentCapability, INBTSerializab
 
             if(fp == null) fp = FishProperties.DEFAULT;
 
-            list.add(new FishCaughtCounter(fp, fishCaughtNetwork.count(), fishCaughtNetwork.fastestTicks(), fishCaughtNetwork.averageTicks()));
+            list.add(new FishCaughtCounter(fp,
+                    fishCaughtNetwork.count(),
+                    fishCaughtNetwork.fastestTicks(),
+                    fishCaughtNetwork.averageTicks(),
+                    fishCaughtNetwork.size(),
+                    fishCaughtNetwork.weight(),
+                    fishCaughtNetwork.golden()));
         }
 
         DataAttachments.get(player).setFishesCaught(list);

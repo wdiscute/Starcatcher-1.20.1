@@ -1,6 +1,9 @@
 package com.wdiscute.starcatcher.guide;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.sounds.Sound;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
@@ -22,7 +25,8 @@ public class FishingGuideItem extends Item
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand)
     {
         if(level.isClientSide) openScreen();
-        return super.use(level, player, usedHand);
+        level.playSound(null, player.blockPosition(), SoundEvents.BOOK_PAGE_TURN, SoundSource.PLAYERS);
+        return InteractionResultHolder.success(player.getItemInHand(usedHand));
     }
 
     @OnlyIn(Dist.CLIENT)

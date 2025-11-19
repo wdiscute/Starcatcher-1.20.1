@@ -6,6 +6,10 @@
       "entries": [
         {
           "type": "minecraft:item",
+          "name": "starcatcher:fish_spotter"
+        },
+        {
+          "type": "minecraft:item",
           "name": "minecraft:diamond"
         },
         {
@@ -66,7 +70,59 @@
         },
         {
           "type": "minecraft:item",
+          "name": "starcatcher:boot"
+        },
+        {
+          "type": "minecraft:item",
           "name": "minecraft:goat_horn"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "starcatcher:broken_bottle"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:emerald_block"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:white_candle"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:recovery_compass"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:saddle"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:saddle"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:copper_ingot"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:blaze_rod"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:shulker_shell"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:nether_wart"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:golden_carrot"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:turtle_helmet"
         }
       ],
       "rolls": 1

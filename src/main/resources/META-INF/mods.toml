@@ -4,10 +4,18 @@ license="MIT"
 
 [[mods]] #mandatory
 modId="starcatcher" #mandatory
-version="1.0" #mandatory
+version="1.1" #mandatory
 displayName="Starcatcher" #mandatory
 authors="wdiscute, Nikdo53, ScribbleDemon" #optional
 description='''A fishing mod with lots of fishes to collect!'''
+
+[[mixins]]
+config="starcatcher.mixins.json"
+
+[[accessTransformers]]
+## The file is relative to the output directory of the resources, or the root path inside the jar when compiled
+## The 'resources' directory represents the root output directory of the resources
+file="META-INF/accesstransformer.cfg"
 
 [[dependencies.starcatcher]] #optional
     modId="forge" #mandatory

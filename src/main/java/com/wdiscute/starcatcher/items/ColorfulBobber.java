@@ -1,6 +1,6 @@
 package com.wdiscute.starcatcher.items;
 
-import com.wdiscute.starcatcher.networkandcodecs.ModDataComponents;
+import com.wdiscute.starcatcher.networkandcodecs.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.server.level.ServerPlayer;
@@ -29,7 +29,7 @@ public class ColorfulBobber extends Item
     {
         super.appendHoverText(stack, level, tooltipComponents, isAdvanced);
 
-        BobberColor bobberColor = ModDataComponents.getBobberColor(stack);
+        BobberColor bobberColor = DataComponents.getBobberColor(stack);
 
         tooltipComponents.add(Component.translatable("tooltip.starcatcher.colorful_bobber.999")
                 .withStyle(Style.EMPTY.withColor(bobberColor.getColorAsInt())));
@@ -45,7 +45,7 @@ public class ColorfulBobber extends Item
         {
             BobberColor bobberColor = BobberColor.random();
 
-            ModDataComponents.setBobberColor(player.getItemInHand(usedHand), bobberColor);
+            DataComponents.setBobberColor(player.getItemInHand(usedHand), bobberColor);
 
             sp.displayClientMessage(
                     Component.literal("Your bobber shines differently...")

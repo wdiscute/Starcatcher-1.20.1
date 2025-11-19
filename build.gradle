@@ -17,6 +17,8 @@ tasks.named('wrapper', Wrapper).configure {
 version = mod_version
 group = mod_group_id
 
+
+
 repositories {
     mavenLocal()
 
@@ -43,7 +45,7 @@ legacyForge {
     }
 
     // This line is optional. Access Transformers are automatically detected
-    // accessTransformers = project.files('src/main/resources/META-INF/accesstransformer.cfg')
+    accessTransformers = project.files('src/main/resources/META-INF/accesstransformer.cfg')
 
     // Default run configurations.
     // These can be tweaked, removed, or duplicated as needed.
@@ -148,12 +150,12 @@ dependencies {
 }
 
 // Uncomment the lines below if you wish to configure mixin. The mixin file should be named modid.mixins.json.
-/*
 mixin {
-    add sourceSets.main, "${mod_id}.refmap.json"
+    //add sourceSets.main, "${mod_id}.refmap.json"
     config "${mod_id}.mixins.json"
 }
 
+/*
 dependencies {
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }

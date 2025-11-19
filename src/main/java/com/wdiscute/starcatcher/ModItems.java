@@ -37,6 +37,8 @@ public interface ModItems
     RegistryObject<Item> CRYSTAL_HOOK = singleStackItemFireResistant("crystal_hook"); //done
     RegistryObject<Item> STONE_HOOK = singleStackItem("stone_hook");  //done
     RegistryObject<Item> SPLIT_HOOK = singleStackItem("split_hook");  //done
+    RegistryObject<Item> STABILIZING_HOOK = singleStackItem("stabilizing_hook");
+    RegistryObject<Item> HEAVY_HOOK = singleStackItem("heavy_hook");
 
     //bobbers
     RegistryObject<Item> CREEPER_BOBBER = singleStackItem("creeper_bobber"); //done
@@ -46,6 +48,8 @@ public interface ModItems
     RegistryObject<Item> STEADY_BOBBER = singleStackItem("steady_bobber"); //done
     RegistryObject<Item> IMPATIENT_BOBBER = singleStackItem("impatient_bobber"); //done
     RegistryObject<Item> FROG_BOBBER = singleStackItem("frog_bobber");
+    RegistryObject<Item> KIMBE_BOBBER = singleStackItem("kimbe_bobber");
+    RegistryObject<Item> CLEAR_BOBBER = singleStackItem("clear_bobber");
 
     //baits
     RegistryObject<Item> CHERRY_BAIT = basicItem("cherry_bait"); //done
@@ -63,6 +67,7 @@ public interface ModItems
     RegistryObject<Item> TROPHY_SILVER = singleStackItemFireResistant("trophy_silver");
     RegistryObject<Item> TROPHY_BRONZE = singleStackItemFireResistant("trophy_bronze");
 
+    RegistryObject<Item> SETTINGS = singleStackItem("settings");
 
 
     //secrets
@@ -225,6 +230,7 @@ public interface ModItems
     //lush caves
     RegistryObject<Item> LUSH_PIKE = fish("lush_pike"); //description
     RegistryObject<Item> VIVID_MOSS = fish("vivid_moss"); //description
+    RegistryObject<Item> THE_QUARRISH = fish("the_quarrish");
 
     //deepslate
     RegistryObject<Item> GHOSTLY_PIKE = fish("ghostly_pike"); //description
@@ -267,6 +273,7 @@ public interface ModItems
     RegistryObject<Item> CHARFISH = fish("charfish"); //todo chosen by charry
     RegistryObject<Item> CHORUS_CRAB = fish("chorus_crab"); //description
     RegistryObject<Item> END_GLOW = fish("end_glow"); //description
+    RegistryObject<Item> VOIDBITER = fish("voidbiter");
 
 
     private static RegistryObject<Item> fish(String name)

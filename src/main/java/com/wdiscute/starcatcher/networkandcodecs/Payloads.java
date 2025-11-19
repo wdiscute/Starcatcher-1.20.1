@@ -15,6 +15,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -27,9 +28,7 @@ import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
-import org.joml.Math;
 
-import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -154,7 +153,7 @@ public class Payloads
                 {
                     FishProperties fp = registry.get(rl);
 
-                    if(fp == null) fp = FishProperties.DEFAULT;
+                    if (fp == null) fp = FishProperties.DEFAULT;
 
                     fishesSeen.add(fp);
                 }
@@ -163,7 +162,7 @@ public class Payloads
 
                 fishesSeen.stream().forEach(f -> currentNotifications.stream().forEach(n ->
                 {
-                  if(n.equals(f)) newList.remove(n);
+                    if (n.equals(f)) newList.remove(n);
                 }));
 
                 DataAttachments.get(player).setFishNotifications(newList);
@@ -234,12 +233,19 @@ public class Payloads
 
                 for (FishProperties fp : fishProperties)
                 {
-                    if(fp.equals(fcc.fp()))  rl = fishProperties.getKey(fp);
+                    if (fp.equals(fcc.fp())) rl = fishProperties.getKey(fp);
                 }
 
                 if (rl == null) rl = Starcatcher.rl("missingno");
 
-                fishCaughtNetworks.add(new FishCaughtNetwork(rl, fcc.count(), fcc.fastestTicks(), fcc.averageTicks()));
+                fishCaughtNetworks.add(new FishCaughtNetwork(
+                        rl, fcc.count(),
+                        fcc.fastestTicks(),
+                        fcc.averageTicks(),
+                        fcc.size(),
+                        fcc.weight(),
+                        fcc.caughtGolden()
+                ));
             }
 
             this.fishesCaught = fishCaughtNetworks;
@@ -336,7 +342,7 @@ public class Payloads
 
                 for (FishProperties fpRegistry : fishProperties)
                 {
-                    if(fpRegistry.equals(fp)) rl = fishProperties.getKey(fpRegistry);
+                    if (fpRegistry.equals(fp)) rl = fishProperties.getKey(fpRegistry);
                 }
 
                 if (rl == null) rl = Starcatcher.rl("missingno");
@@ -429,25 +435,25 @@ public class Payloads
     //send fishing minigame completed to server
     public static class FishingCompletedPayload
     {
-        private final int tickCount;
-        private final boolean awardTreasure;
+        private final int time;
+        private final boolean completedTreasure;
         private final boolean perfectCatch;
-        private final int consecutiveHits;
+        private final int hits;
 
         public FishingCompletedPayload(int tickCount, boolean awardTreasure, boolean perfectCatch, int consecutiveHits)
         {
-            this.tickCount = tickCount;
-            this.awardTreasure = awardTreasure;
+            this.time = tickCount;
+            this.completedTreasure = awardTreasure;
             this.perfectCatch = perfectCatch;
-            this.consecutiveHits = consecutiveHits;
+            this.hits = consecutiveHits;
         }
 
         public static void encode(FishingCompletedPayload fishingCompletedPayload, FriendlyByteBuf buf)
         {
-            buf.writeInt(fishingCompletedPayload.tickCount);
-            buf.writeBoolean(fishingCompletedPayload.awardTreasure);
+            buf.writeInt(fishingCompletedPayload.time);
+            buf.writeBoolean(fishingCompletedPayload.completedTreasure);
             buf.writeBoolean(fishingCompletedPayload.perfectCatch);
-            buf.writeInt(fishingCompletedPayload.consecutiveHits);
+            buf.writeInt(fishingCompletedPayload.hits);
         }
 
         public static FishingCompletedPayload decode(FriendlyByteBuf buf)
@@ -476,7 +482,7 @@ public class Payloads
                     {
                         if (entity instanceof FishingBobEntity fbe)
                         {
-                            if (data.tickCount != -1)
+                            if (data.time != -1)
                             {
                                 FishProperties fp = fbe.fpToFish;
 
@@ -486,11 +492,20 @@ public class Payloads
 
                                 //assign custom name if fish has one
                                 if (!fp.customName().isEmpty())
+                                {
                                     is.setHoverName(Component.literal(fp.customName()));
+                                }
 
                                 //store fish properties in itemstack
-                                ModDataComponents.setFishProperties(is, fp);
-                                //is.set(ModDataComponents.FISH_PROPERTIES, fp);
+                                DataComponents.setFishProperties(is, fp);
+
+                                //store size and weight data component
+                                int size = ((int) Starcatcher.truncatedNormal(fp.sw().sizeAverage(), fp.sw().sizeDeviation()));
+                                int weight = ((int) Starcatcher.truncatedNormal(fp.sw().weightAverage(), fp.sw().weightDeviation()));
+                                DataComponents.setSizeAndWeight(is, new SizeAndWeight(size, weight));
+
+                                //award fish counter
+                                FishCaughtCounter.AwardFishCaughtCounter(fbe.fpToFish, player, data.time, size, weight);
 
                                 //split hook double drops
                                 if (data.perfectCatch && fbe.hook.is(ModItems.SPLIT_HOOK.get())) is.setCount(2);
@@ -500,27 +515,20 @@ public class Payloads
                                 ItemEntity treasureFished = new ItemEntity(level, fbe.position().x, fbe.position().y + 1.2f, fbe.position().z, treasure);
 
                                 //assign delta movement so fish flies towards player
-                                double x = Math.clamp(-1, 1, (player.position().x - fbe.position().x) / 25);
-                                double y = Math.clamp(-1, 1, (player.position().y - fbe.position().y) / 20);
-                                double z = Math.clamp(-1, 1, (player.position().z - fbe.position().z) / 25);
+                                double x = Mth.clamp((player.position().x - fbe.position().x) / 25, -1, 1);
+                                double y = Mth.clamp((player.position().y - fbe.position().y) / 20, -1, 1);
+                                double z = Mth.clamp((player.position().z - fbe.position().z) / 25, -1, 1);
                                 Vec3 vec3 = new Vec3(x, 0.7 + y, z);
                                 itemFished.setDeltaMovement(vec3);
                                 treasureFished.setDeltaMovement(vec3);
 
                                 //add itemEntities to level
                                 level.addFreshEntity(itemFished);
-                                if (data.awardTreasure) level.addFreshEntity(treasureFished);
+                                if (data.completedTreasure) level.addFreshEntity(treasureFished);
 
                                 //play sound
                                 Vec3 p = player.position();
                                 level.playSound(null, p.x, p.y, p.z, SoundEvents.VILLAGER_CELEBRATE, SoundSource.AMBIENT, 1f, 1f);
-
-                                //award fish counter
-                                if (FishCaughtCounter.AwardFishCaughtCounter(fbe.fpToFish, player, data.tickCount))
-                                    Payloads.CHANNEL.send(
-                                            net.minecraftforge.network.PacketDistributor.PLAYER.with(() -> player),
-                                            new Payloads.FishCaughtPayload(fp)
-                                    );
 
                                 //award fish counter
                                 List<FishProperties> list = new ArrayList<>(DataAttachments.get(player).fishNotifications());
@@ -534,12 +542,8 @@ public class Payloads
                                 if (fp.rarity() == FishProperties.Rarity.EPIC) exp = 20;
                                 if (fp.rarity() == FishProperties.Rarity.LEGENDARY) exp = 35;
                                 if (fbe.hook.is(ModItems.GOLD_HOOK.get()))
-                                    exp *= (int) ((double) data.consecutiveHits / 3) + 1; //extra exp if gold hook is used
+                                    exp *= (int) ((double) data.hits / 3) + 1; //extra exp if gold hook is used
                                 player.giveExperiencePoints(exp);
-
-                                //todo trigger item fished event
-                                //ItemFishedEvent event = new ItemFishedEvent(List.of(is), 0, null);
-                                //NeoForge.EVENT_BUS.post(event);
 
                             }
                             else
@@ -567,49 +571,43 @@ public class Payloads
     public static class FishCaughtPayload
     {
         private final FishProperties fp;
+        private final boolean newFish;
+        private final int size;
+        private final int weight;
 
-        public FishCaughtPayload(FishProperties fp)
+        public FishCaughtPayload(FishProperties fp, boolean newFish, int size, int weight)
         {
             this.fp = fp;
+            this.newFish = newFish;
+            this.size = size;
+            this.weight = weight;
         }
 
         public static void encode(Payloads.FishCaughtPayload fishCaughtPayload, FriendlyByteBuf buf)
         {
             buf.writeJsonWithCodec(FishProperties.CODEC, fishCaughtPayload.fp);
+            buf.writeBoolean(fishCaughtPayload.newFish);
+            buf.writeInt(fishCaughtPayload.size);
+            buf.writeInt(fishCaughtPayload.weight);
         }
 
         public static Payloads.FishCaughtPayload decode(FriendlyByteBuf buf)
         {
             FishProperties fp = buf.readJsonWithCodec(FishProperties.CODEC);
+            boolean newFish = buf.readBoolean();
+            int size = buf.readInt();
+            int weight = buf.readInt();
 
-            return new Payloads.FishCaughtPayload(fp);
+            return new Payloads.FishCaughtPayload(fp, newFish, size, weight);
         }
 
-        public static void handle(Payloads.FishCaughtPayload fishingPayload, Supplier<NetworkEvent.Context> context)
+        public static void handle(Payloads.FishCaughtPayload data, Supplier<NetworkEvent.Context> context)
         {
             context.get().enqueueWork(() ->
             {
-                Starcatcher.fishCaughtToast(fishingPayload.fp);
+                Starcatcher.fishCaughtToast(data.fp, data.newFish, data.size, data.weight);
             });
             context.get().setPacketHandled(true);
         }
     }
-
-
-//    public record FPsSeen(List<FishProperties> fps) implements CustomPacketPayload
-//    {
-//
-//        public static final Type<FPsSeen> TYPE = new Type<>(Starcatcher.rl("fps_seen"));
-//
-//        public static final StreamCodec<ByteBuf, FPsSeen> STREAM_CODEC = StreamCodec.composite(
-//                ByteBufCodecs.fromCodec(FishProperties.LIST_CODEC),
-//                FPsSeen::fps,
-//                FPsSeen::new
-//        );
-//
-//        @Override
-//        public Type<? extends CustomPacketPayload> type() {
-//            return TYPE;
-//        }
-//    }
 }

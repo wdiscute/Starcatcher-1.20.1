@@ -10,7 +10,7 @@ import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.ItemStack;
 import org.slf4j.Logger;
 
-public class ModDataComponents
+public class DataComponents
 {
     private static final Logger LOGGER = LogUtils.getLogger();
 
@@ -75,11 +75,8 @@ public class ModDataComponents
         {
             if (is.getTag().contains("trophy_properties"))
             {
-
                 CompoundTag trophyProperties = is.getOrCreateTag().getCompound("trophy_properties");
-
                 DataResult<TrophyProperties> decode = TrophyProperties.CODEC.parse(NbtOps.INSTANCE, trophyProperties);
-
                 return decode.result().orElse(TrophyProperties.DEFAULT);
             }
         }
@@ -91,6 +88,28 @@ public class ModDataComponents
     {
         TrophyProperties.CODEC.encode(tp, NbtOps.INSTANCE, new CompoundTag())
                 .resultOrPartial(LOGGER::warn).ifPresent(tag -> is.getOrCreateTag().put("trophy_properties", tag));
+    }
+
+    public static void setSizeAndWeight(ItemStack is, SizeAndWeight sw)
+    {
+        is.getOrCreateTag().putInt("starcatcher_size", sw.sizeInCentimeters());
+        is.getOrCreateTag().putInt("starcatcher_weight", sw.weightInGrams());
+    }
+
+    public static SizeAndWeight getSizeAndWeight(ItemStack is)
+    {
+        if (is.hasTag())
+        {
+            if (is.getTag().contains("starcatcher_size"))
+            {
+                return new SizeAndWeight(
+                        is.getTag().getInt("starcatcher_size"),
+                        is.getTag().getInt("starcatcher_weight"));
+            }
+        }
+
+        return SizeAndWeight.DEFAULT;
+
     }
 
 

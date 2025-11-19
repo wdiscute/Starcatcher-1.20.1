@@ -6,7 +6,9 @@ import com.wdiscute.starcatcher.fishentity.FishEntity;
 import com.wdiscute.starcatcher.fishentity.FishRenderer;
 import com.wdiscute.starcatcher.fishspotter.FishTrackerLayer;
 import com.wdiscute.starcatcher.guide.FishCaughtToast;
+import com.wdiscute.starcatcher.guide.SettingsScreen;
 import com.wdiscute.starcatcher.networkandcodecs.*;
+import com.wdiscute.starcatcher.particles.FishingBitingLavaParticles;
 import com.wdiscute.starcatcher.particles.FishingBitingParticles;
 import com.wdiscute.starcatcher.particles.FishingNotificationParticles;
 import com.wdiscute.starcatcher.rod.FishingRodScreen;
@@ -20,7 +22,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -42,12 +43,14 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.registries.DataPackRegistryEvent;
 
 import java.util.List;
+import java.util.Random;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
 @Mod(Starcatcher.MOD_ID)
@@ -66,10 +69,38 @@ public class Starcatcher
         return ResourceLocation.fromNamespaceAndPath(Starcatcher.MOD_ID, s);
     }
 
-    @OnlyIn(Dist.CLIENT)
-    public static void fishCaughtToast(FishProperties fp)
+    public static final Random r = new Random();
+
+    public static double truncatedNormal(double mean, double deviation)
     {
-        Minecraft.getInstance().getToasts().addToast(new FishCaughtToast(fp));
+        while (true)
+        {
+            double value = mean + deviation * r.nextGaussian();
+            if (value >= mean - deviation && value <= mean + deviation)
+            {
+                return value;
+            }
+        }
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public static void fishCaughtToast(FishProperties fp, boolean newFish, int sizeCM, int weightCM)
+    {
+        if(newFish) Minecraft.getInstance().getToasts().addToast(new FishCaughtToast(fp));
+
+        SettingsScreen.Units units = Config.UNIT.get();
+
+        String size = units.getSizeAsString(sizeCM);
+        String weight = units.getWeightAsString(weightCM);
+
+        Minecraft.getInstance().player.displayClientMessage(
+                Component.literal("")
+                        .append(Component.translatable(fp.fish().value().getDescriptionId()))
+                        .append(Component.literal(" - " + size + " - " + weight))
+                , true);
+
+        Minecraft.getInstance().gui.overlayMessageTime = 180;
+
     }
 
     public Starcatcher(FMLJavaModLoadingContext context)
@@ -84,6 +115,9 @@ public class Starcatcher
         ModMenuTypes.register(eventBus);
 
         Payloads.register();
+
+        context.registerConfig(ModConfig.Type.CLIENT, Config.SPEC);
+        context.registerConfig(ModConfig.Type.SERVER, Config.SPEC_SERVER);
     }
 
     @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
@@ -149,9 +183,23 @@ public class Starcatcher
             List<Component> comp = event.getToolTip();
             ItemStack stack = event.getItemStack();
 
-            if (!ModDataComponents.getTrophyProperties(stack).equals(TrophyProperties.DEFAULT))
+            SizeAndWeight wdad = DataComponents.getSizeAndWeight(stack);
+
+            if (!DataComponents.getSizeAndWeight(stack).equals(SizeAndWeight.DEFAULT))
             {
-                TrophyProperties tp = ModDataComponents.getTrophyProperties(stack);
+                SizeAndWeight sw = DataComponents.getSizeAndWeight(stack);
+
+                SettingsScreen.Units units = Config.UNIT.get();
+
+                String size = units.getSizeAsString(sw.sizeInCentimeters());
+                String weight = units.getWeightAsString(sw.weightInGrams());
+
+                comp.add(1, Component.literal(size + " - " + weight).withStyle(Style.EMPTY.withColor(0x888888)));
+            }
+
+            if (!DataComponents.getTrophyProperties(stack).equals(TrophyProperties.DEFAULT))
+            {
+                TrophyProperties tp = DataComponents.getTrophyProperties(stack);
 
                 comp.set(0, comp.get(0).copy().withStyle(Style.EMPTY.withItalic(false)));
 
@@ -304,6 +352,7 @@ public class Starcatcher
         {
             event.registerSpriteSet(ModParticles.FISHING_NOTIFICATION.get(), FishingNotificationParticles.Provider::new);
             event.registerSpriteSet(ModParticles.FISHING_BITING.get(), FishingBitingParticles.Provider::new);
+            event.registerSpriteSet(ModParticles.FISHING_BITING_LAVA.get(), FishingBitingLavaParticles.Provider::new);
         }
 
         @SubscribeEvent

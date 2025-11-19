@@ -3,7 +3,7 @@ package com.wdiscute.starcatcher.rod;
 import com.wdiscute.starcatcher.ModItems;
 import com.wdiscute.starcatcher.bob.FishingBobEntity;
 import com.wdiscute.starcatcher.networkandcodecs.DataAttachments;
-import com.wdiscute.starcatcher.networkandcodecs.ModDataComponents;
+import com.wdiscute.starcatcher.networkandcodecs.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -21,7 +21,6 @@ import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 
-import javax.xml.crypto.Data;
 import java.util.List;
 
 public class StarcatcherFishingRod extends Item implements MenuProvider
@@ -48,7 +47,7 @@ public class StarcatcherFishingRod extends Item implements MenuProvider
 
             if(!is.hasTag())
             {
-                ModDataComponents.setItemInSlot(is, ModDataComponents.Slots.HOOK, new ItemStack(ModItems.HOOK.get()));
+                DataComponents.setItemInSlot(is, DataComponents.Slots.HOOK, new ItemStack(ModItems.HOOK.get()));
             }
             player.openMenu(this);
             return InteractionResultHolder.success(player.getItemInHand(hand));

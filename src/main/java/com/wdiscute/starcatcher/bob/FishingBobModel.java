@@ -41,7 +41,7 @@ public class FishingBobModel<T extends FishingBobEntity> extends HierarchicalMod
     public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha)
     {
         super.renderToBuffer(poseStack, buffer, packedLight, packedOverlay, red, green, blue, alpha);
-        root.render(poseStack, buffer, packedLight, packedOverlay);
+        root.render(poseStack, buffer, packedLight, packedOverlay, red, green, blue, alpha);
     }
 
     @Override

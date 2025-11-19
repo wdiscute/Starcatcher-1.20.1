@@ -45,7 +45,7 @@ public class AwardOneFish extends Item
         {
             FishProperties fp = optional.get().value();
 
-            fishCounter.add(new FishCaughtCounter(fp, 1, Integer.MAX_VALUE, 99999));
+            fishCounter.add(new FishCaughtCounter(fp, 999999, 0, 0, 0, 0, false));
             fishesNotification.add(fp);
 
             if (player instanceof ServerPlayer sp)

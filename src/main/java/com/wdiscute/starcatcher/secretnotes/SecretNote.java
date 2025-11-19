@@ -1,7 +1,7 @@
 package com.wdiscute.starcatcher.secretnotes;
 
 import com.mojang.serialization.Codec;
-import com.wdiscute.starcatcher.networkandcodecs.ModDataComponents;
+import com.wdiscute.starcatcher.networkandcodecs.DataComponents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
@@ -25,7 +25,7 @@ public class SecretNote extends Item
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand)
     {
-        if (level.isClientSide) openScreen(ModDataComponents.getSecretNote(player.getItemInHand(usedHand)));
+        if (level.isClientSide) openScreen(DataComponents.getSecretNote(player.getItemInHand(usedHand)));
         return super.use(level, player, usedHand);
     }
 

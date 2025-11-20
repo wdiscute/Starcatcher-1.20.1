@@ -4,6 +4,8 @@
   "dimension.minecraft.the_end": "The End",
   "dimension.minecraft.the_nether": "The Nether",
 
+  "emi.category.starcatcher.fishing" : "Starcatcher's Fishing",
+
   "creativetab.starcatcher.starcatcher": "Starcatcher",
 
   "tag.starcatcher.is_beach" : "Beaches",
@@ -213,9 +215,9 @@
   "tooltip.starcatcher.scalding_treasure.0" : "A treasure fished directly from the scalding",
   "tooltip.starcatcher.scalding_treasure.1" : "lands of The Nether. What's inside?",
 
-  "item.starcatcher.trophy_gold" : "Gold Trophy",
-  "item.starcatcher.trophy_silver" : "Silver Trophy",
-  "item.starcatcher.trophy_bronze" : "Bronze Trophy",
+  "block.starcatcher.trophy_gold" : "Gold Trophy",
+  "block.starcatcher.trophy_silver" : "Silver Trophy",
+  "block.starcatcher.trophy_bronze" : "Bronze Trophy",
 
   "item.starcatcher.award_all_fishes" : "Award All Fishes",
   "item.starcatcher.award_one_fish" : "Award One Fish",
@@ -252,6 +254,17 @@
 
 
   "gui.starcatcher.toast.fish_caught" : "New Fish Caught!",
+
+  "gui.guide.sort.alphabetical_up" : "⏬ Alphabetical",
+  "gui.guide.sort.alphabetical_down" : "⏫ Alphabetical",
+  "gui.guide.sort.mod_up" : "⏬ Mod Name",
+  "gui.guide.sort.mod_down" : "⏫ Mod Name",
+  "gui.guide.sort.rarity_up" : "⏬ Rarity",
+  "gui.guide.sort.rarity_down" : "⏫ Rarity",
+  "gui.guide.sort.caught_up" : "⏬ Caught",
+  "gui.guide.sort.caught_down" : "⏫ Caught",
+  "gui.guide.sort.fluid_up" : "⏬ Fluid",
+  "gui.guide.sort.fluid_down" : "⏫ Fluid",
 
 
   "gui.guide.units.metric" : "Metric (cm & kg)",
@@ -303,9 +316,9 @@
 
   "gui.guide.basics" : "   The Basics",
   "gui.guide.treasures" : "  Treasures",
-  "gui.guide.hooks" : "       Hooks",
+  "gui.guide.hooks" : "      Hooks",
   "gui.guide.bobbers" : "      Bobbers",
-  "gui.guide.baits" : "        Baits",
+  "gui.guide.baits" : "      Baits",
   "gui.guide.gadgets" : "      Gadgets",
   "gui.guide.trophies" : "    Trophies",
   "gui.guide.secrets" : "      Secrets",
@@ -645,7 +658,7 @@
   "tooltip.starcatcher.secret_note.2" : "those probably not amongst us anymore.",
 
   "item.starcatcher.broken_bottle" : "Broken Bottle",
-  "tooltip.starcatcher.broken_bottle.0" : "The remains of a once intact bottle.",
+  "tooltip.starcatcher.broken_bottle.0" : "The remains of an once intact bottle.",
 
   "item.starcatcher.settings" : "Settings",
 
@@ -673,6 +686,9 @@
   "item.starcatcher.true_blue_bottle" : "True Blue Bottle",
   "tooltip.starcatcher.true_blue_bottle.0" : "A bottle glimmering a pale blue.",
   "tooltip.starcatcher.true_blue_bottle.1" : "The purest version of yourself shines from inside.",
+  "tooltip.starcatcher.true_blue_bottle.2" : "",
+  "tooltip.starcatcher.true_blue_bottle.3" : "Instinctive, impatient, impossible.",
+  "tooltip.starcatcher.true_blue_bottle.4" : "In memory, mirror, and membrane.",
 
 
   "item.starcatcher.obidontiee" : "Obidontiee",

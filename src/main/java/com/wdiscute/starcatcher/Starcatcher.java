@@ -1,5 +1,7 @@
 package com.wdiscute.starcatcher;
 
+import com.wdiscute.starcatcher.blocks.ModBlockEntities;
+import com.wdiscute.starcatcher.blocks.ModBlocks;
 import com.wdiscute.starcatcher.bob.FishingBobModel;
 import com.wdiscute.starcatcher.bob.FishingBobRenderer;
 import com.wdiscute.starcatcher.fishentity.FishEntity;
@@ -109,6 +111,8 @@ public class Starcatcher
 
         ModCreativeModeTabs.register(eventBus);
         ModItems.register(eventBus);
+        ModBlocks.register(eventBus);
+        ModBlockEntities.register(eventBus);
         ModSounds.register(eventBus);
         ModEntities.register(eventBus);
         ModParticles.register(eventBus);

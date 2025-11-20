@@ -62,11 +62,6 @@ public interface ModItems
 
     RegistryObject<Item> ROD = ITEMS.register("starcatcher_rod", StarcatcherFishingRod::new); //missing better tooltip
 
-    //trophies
-    RegistryObject<Item> TROPHY_GOLD = singleStackItemFireResistant("trophy_gold");
-    RegistryObject<Item> TROPHY_SILVER = singleStackItemFireResistant("trophy_silver");
-    RegistryObject<Item> TROPHY_BRONZE = singleStackItemFireResistant("trophy_bronze");
-
     RegistryObject<Item> SETTINGS = singleStackItem("settings");
 
 

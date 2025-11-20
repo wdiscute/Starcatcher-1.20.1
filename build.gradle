@@ -18,15 +18,30 @@ version = mod_version
 group = mod_group_id
 
 
-
-repositories {
-    mavenLocal()
-
-    flatDir {
-        dir 'libs'
-    }
-
+dependencies {
+    //emi
+    compileOnly "dev.emi:emi-forge:${emi_version}:api"
+    //runtimeOnly "dev.emi:emi-forge:${emi_version}"
 }
+
+repositories
+        {
+            //emi
+            maven {
+                name = "TerraformersMC"
+                url = "https://maven.terraformersmc.com/"
+            }
+
+            //favouriteless
+            maven {
+                url = "https://maven.favouriteless.net/releases"
+            }
+
+            //modrinth
+            maven {
+                url = "https://api.modrinth.com/maven"
+            }
+        }
 
 base {
     archivesName = mod_id
@@ -55,8 +70,9 @@ legacyForge {
 
             // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
             systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
-        }
 
+
+        }
         server {
             server()
             programArgument '--nogui'
@@ -122,66 +138,28 @@ obfuscation {
     createRemappingConfiguration(configurations.localRuntime)
 }
 
-dependencies {
-    // If you wish to declare dependencies against mods, make sure to use the 'mod*' configurations so that they're remapped.
-    // See https://github.com/neoforged/ModDevGradle/blob/main/LEGACY.md#remapping-mod-dependencies for more information.
-
-    // Example optional mod dependency with JEI
-    // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
-    // modCompileOnly "mezz.jei:jei-${mc_version}-common-api:${jei_version}"
-    // modCompileOnly "mezz.jei:jei-${mc_version}-neoforge-api:${jei_version}"
-    // We add the full version to localRuntime, not runtimeOnly, so that we do not publish a dependency on it
-    // modLocalRuntime "mezz.jei:jei-${mc_version}-neoforge:${jei_version}"
-
-    // Example mod dependency using a mod jar from ./libs with a flat dir repository
-    // This maps to ./libs/coolmod-${mc_version}-${coolmod_version}.jar
-    // The group id is ignored when searching -- in this case, it is "blank"
-    //modImplementation "blank:ProjectE-1.20.1-PE1.0.1"
-
-    // Example mod dependency using a file as dependency
-    // modImplementation files("libs/coolmod-${mc_version}-${coolmod_version}.jar")
-
-    // Example project dependency using a sister or child project:
-    // modImplementation project(":myproject")
-
-    // For more info:
-    // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
-    // http://www.gradle.org/docs/current/userguide/dependency_management.html
-}
-
 // Uncomment the lines below if you wish to configure mixin. The mixin file should be named modid.mixins.json.
 mixin {
     //add sourceSets.main, "${mod_id}.refmap.json"
     config "${mod_id}.mixins.json"
 }
 
-/*
-dependencies {
-    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
-}
-
-jar {
-    manifest.attributes([
-            "MixinConfigs": "${mod_id}.mixins.json"
-    ])
-}
-*/
 
 // This block of code expands all declared replace properties in the specified resource targets.
 // A missing property will result in an error. Properties are expanded using ${} Groovy notation.
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
     var replaceProperties = [
-            minecraft_version        : minecraft_version,
-            minecraft_version_range  : minecraft_version_range,
-            forge_version            : forge_version,
-            forge_version_range      : forge_version_range,
-            loader_version_range     : loader_version_range,
-            mod_id                   : mod_id,
-            mod_name                 : mod_name,
-            mod_license              : mod_license,
-            mod_version              : mod_version,
-            mod_authors              : mod_authors,
-            mod_description          : mod_description
+            minecraft_version      : minecraft_version,
+            minecraft_version_range: minecraft_version_range,
+            forge_version          : forge_version,
+            forge_version_range    : forge_version_range,
+            loader_version_range   : loader_version_range,
+            mod_id                 : mod_id,
+            mod_name               : mod_name,
+            mod_license            : mod_license,
+            mod_version            : mod_version,
+            mod_authors            : mod_authors,
+            mod_description        : mod_description
     ]
     inputs.properties replaceProperties
     expand replaceProperties

@@ -8,6 +8,7 @@ import com.wdiscute.starcatcher.Config;
 import com.wdiscute.starcatcher.ModItems;
 import com.wdiscute.starcatcher.Starcatcher;
 import com.wdiscute.starcatcher.Tooltips;
+import com.wdiscute.starcatcher.blocks.ModBlocks;
 import com.wdiscute.starcatcher.networkandcodecs.*;
 import com.wdiscute.starcatcher.secretnotes.NoteContainer;
 import com.wdiscute.starcatcher.secretnotes.SecretNoteScreen;
@@ -34,9 +35,8 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.network.PacketDistributor;
 
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Optional;
 
 public class FishingGuideScreen extends Screen
 {
@@ -153,6 +153,184 @@ public class FishingGuideScreen extends Screen
     TrophyProperties.RarityProgress epic = TrophyProperties.RarityProgress.DEFAULT;
     TrophyProperties.RarityProgress legendary = TrophyProperties.RarityProgress.DEFAULT;
 
+    public enum Sort
+    {
+        ALPHABETICAL_UP("gui.guide.sort.alphabetical_up"),
+        ALPHABETICAL_DOWN("gui.guide.sort.alphabetical_down"),
+        MOD_UP("gui.guide.sort.mod_up"),
+        MOD_DOWN("gui.guide.sort.mod_down"),
+        RARITY_UP("gui.guide.sort.rarity_up"),
+        RARITY_DOWN("gui.guide.sort.rarity_down"),
+        CAUGHT_UP("gui.guide.sort.caught_up"),
+        CAUGHT_DOWN("gui.guide.sort.caught_down"),
+        FLUID_UP("gui.guide.sort.fluid_up"),
+        FLUID_DOWN("gui.guide.sort.fluid_down");
+
+        private static final Sort[] vals = values();
+
+        private final String translationKey;
+
+        String getTranslationKey()
+        {
+            return this.translationKey;
+        }
+
+        Sort(String translationKey)
+        {
+            this.translationKey = translationKey;
+        }
+
+        public Sort previous()
+        {
+            if (this.ordinal() == 0) return vals[vals.length - 1];
+            return vals[(this.ordinal() - 1) % vals.length];
+        }
+
+        public Sort next()
+        {
+            return vals[(this.ordinal() + 1) % vals.length];
+        }
+    }
+
+    private void sortEntries()
+    {
+        Sort sort = Config.SORT.get();
+
+        //rarity
+        if (sort.equals(Sort.RARITY_DOWN) || sort.equals(Sort.RARITY_UP))
+        {
+            List<FishProperties> entriesSorted = new ArrayList<>();
+
+            entries.forEach(e -> {if (e.rarity().equals(FishProperties.Rarity.COMMON)) entriesSorted.add(e);});
+            entries.forEach(e -> {if (e.rarity().equals(FishProperties.Rarity.UNCOMMON)) entriesSorted.add(e);});
+            entries.forEach(e -> {if (e.rarity().equals(FishProperties.Rarity.RARE)) entriesSorted.add(e);});
+            entries.forEach(e -> {if (e.rarity().equals(FishProperties.Rarity.EPIC)) entriesSorted.add(e);});
+            entries.forEach(e -> {if (e.rarity().equals(FishProperties.Rarity.LEGENDARY)) entriesSorted.add(e);});
+
+            if(!sort.equals(Sort.RARITY_UP)) Collections.reverse(entriesSorted);
+            entries = entriesSorted;
+        }
+
+        //alphabetical
+        if (sort.equals(Sort.ALPHABETICAL_DOWN) || sort.equals(Sort.ALPHABETICAL_UP))
+        {
+            List<FishProperties> entriesSorted = new ArrayList<>();
+            Map<String, FishProperties> map = new HashMap<>();
+            List<String> entriesString = new ArrayList<>();
+
+            for (FishProperties fp : entries)
+            {
+                String path = fp.fish().unwrapKey().get().location().getPath();
+                map.put(path, fp);
+                entriesString.add(path);
+            }
+
+            entriesString = entriesString.stream().sorted().toList();
+
+            for (String s : entriesString) entriesSorted.add(map.get(s));
+
+            if(!sort.equals(Sort.ALPHABETICAL_UP)) Collections.reverse(entriesSorted);
+            entries = entriesSorted;
+        }
+
+        //mod
+        if (sort.equals(Sort.MOD_DOWN) || sort.equals(Sort.MOD_UP))
+        {
+            List<FishProperties> entriesSorted = new ArrayList<>();
+            Map<String, FishProperties> map = new HashMap<>();
+            List<String> entriesString = new ArrayList<>();
+
+            for (FishProperties fp : entries)
+            {
+                String namespace = fp.fish().unwrapKey().get().location().getPath();
+                map.put(namespace, fp);
+                entriesString.add(namespace);
+            }
+
+            entriesString = entriesString.stream().sorted().toList();
+
+            for (String s : entriesString) entriesSorted.add(map.get(s));
+
+            if(!sort.equals(Sort.MOD_UP)) Collections.reverse(entriesSorted);
+            entries = entriesSorted;
+        }
+
+        //fluid
+        if (sort.equals(Sort.FLUID_DOWN) || sort.equals(Sort.FLUID_UP))
+        {
+            Config.SORT.set(Sort.ALPHABETICAL_UP);
+            Config.SORT.save();
+            sortEntries();
+            Config.SORT.set(sort);
+            Config.SORT.save();
+            List<FishProperties> entriesSorted = new ArrayList<>();
+            List<FishProperties> entriesRemaining = new ArrayList<>(entries);
+
+            while (!entriesRemaining.isEmpty())
+            {
+                ResourceLocation rlBeingSorted = entriesRemaining.get(0).wr().fluids().get(0);
+                List<FishProperties> temp = new ArrayList<>(entriesRemaining);
+                temp.forEach(e ->
+                {
+                    if(e.wr().fluids().get(0).equals(rlBeingSorted))
+                    {
+                        entriesSorted.add(e);
+                        entriesRemaining.remove(e);
+                    }
+                });
+            }
+
+            if(!sort.equals(Sort.FLUID_UP)) Collections.reverse(entriesSorted);
+            entries = entriesSorted;
+        }
+
+        //caught
+        if (sort.equals(Sort.CAUGHT_UP) || sort.equals(Sort.CAUGHT_DOWN))
+        {
+            Config.SORT.set(Sort.ALPHABETICAL_UP);
+            Config.SORT.save();
+            sortEntries();
+            Config.SORT.set(sort);
+            Config.SORT.save();
+            List<FishProperties> entriesSorted = new ArrayList<>();
+
+            entries.forEach(fp ->
+            {
+                FishCaughtCounter fcc = null;
+                for (FishCaughtCounter fccAll : fishCaughtCounterList)
+                {
+                    if (fp.equals(fccAll.fp()))
+                    {
+                        fcc = fccAll;
+                        break;
+                    }
+                }
+
+                if(fcc != null) entriesSorted.add(fp);
+            });
+
+
+            entries.forEach(fp ->
+            {
+                FishCaughtCounter fcc = null;
+                for (FishCaughtCounter fccAll : fishCaughtCounterList)
+                {
+                    if (fp.equals(fccAll.fp()))
+                    {
+                        fcc = fccAll;
+                        break;
+                    }
+                }
+
+                if(fcc == null) entriesSorted.add(fp);
+            });
+
+            if(!sort.equals(Sort.CAUGHT_UP)) Collections.reverse(entriesSorted);
+            entries = entriesSorted;
+        }
+
+    }
+
     @Override
     protected void init()
     {
@@ -172,6 +350,8 @@ public class FishingGuideScreen extends Screen
         player = Minecraft.getInstance().player;
 
         for (FishProperties fp : FishProperties.getFPs(level)) if (fp.hasGuideEntry()) entries.add(fp);
+        sortEntries();
+
         for (TrophyProperties tp : level.registryAccess().registryOrThrow(Starcatcher.TROPHY_REGISTRY))
             if (tp.trophyType() == TrophyProperties.TrophyType.TROPHY) trophiesTps.add(tp);
 
@@ -364,6 +544,21 @@ public class FishingGuideScreen extends Screen
         double x = mouseX - uiX;
         double y = mouseY - uiY;
 
+        int numberOfRows = (fishInArea.size() - 1) / 7 + 1;
+        //sort
+        if ((x > 168 && x < 191 && y > 121 && y < 128 && numberOfRows == 1) ||
+                (x > 168 && x < 191 && y > 141 && y < 148 && numberOfRows == 2) ||
+                (x > 168 && x < 191 && y > 161 && y < 168 && numberOfRows == 3) ||
+                (x > 168 && x < 191 && y > 181 && y < 188 && numberOfRows == 4)
+        )
+        {
+            if(button == 0) Config.SORT.set(Config.SORT.get().next());
+            if(button == 1) Config.SORT.set(Config.SORT.get().previous());
+            Config.SORT.save();
+            sortEntries();
+        }
+
+
         //previous arrow
         if (x > 49 && x < 69 && y > 203 && y < 217)
         {
@@ -396,7 +591,7 @@ public class FishingGuideScreen extends Screen
     {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
 
-        //render index
+        //render settings screen
         if (menu == -1)
         {
             Minecraft.getInstance().setScreen(
@@ -794,6 +989,18 @@ public class FishingGuideScreen extends Screen
 
             int numberOfRows = (fishInArea.size() - 1) / 7 + 1;
 
+            int x = mouseX - uiX;
+            int y2 = mouseY - uiY;
+
+            if ((x > 168 && x < 191 && y2 > 121 && y2 < 128 && numberOfRows == 1) ||
+                    (x > 168 && x < 191 && y2 > 141 && y2 < 148 && numberOfRows == 2) ||
+                    (x > 168 && x < 191 && y2 > 161 && y2 < 168 && numberOfRows == 3) ||
+                    (x > 168 && x < 191 && y2 > 181 && y2 < 188 && numberOfRows == 4)
+            )
+            {
+                guiGraphics.renderTooltip(this.font, Component.translatable(Config.SORT.get().getTranslationKey()), mouseX, mouseY);
+            }
+
             if (!fishInArea.isEmpty())
                 renderImage(guiGraphics, FISHES_IN_AREA_BOTTOM_LEFT_DECORATION, 0, (numberOfRows - 1) * 20);
 
@@ -1070,7 +1277,6 @@ public class FishingGuideScreen extends Screen
 
             guiGraphics.renderTooltip(this.font, components, Optional.empty(), mouseX, mouseY);
         }
-
 
         int yOffset = 121;
 
@@ -1620,7 +1826,7 @@ public class FishingGuideScreen extends Screen
 
 
         fishSpotter = new ItemStack(ModItems.FISH_SPOTTER.get());
-        trophies = new ItemStack(ModItems.TROPHY_GOLD.get());
+        trophies = new ItemStack(ModBlocks.TROPHY_GOLD.get());
         secrets = new ItemStack(ModItems.WATERLOGGED_BOTTLE.get());
 
         settings = new ItemStack(ModItems.SETTINGS.get());

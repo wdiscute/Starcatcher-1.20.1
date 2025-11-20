@@ -94,8 +94,8 @@ public class FishingMinigameScreen extends Screen implements GuiEventListener
 
     int currentRotation = 1;
 
-    float partial;
-    float partialPointerPosition;
+    int lastTick;
+    float partialTick;
 
     float hitDelay;
 
@@ -243,13 +243,17 @@ public class FishingMinigameScreen extends Screen implements GuiEventListener
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick)
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float FRACTION_OF_A_TICK_THAT_HAPPENED_SINCE_THE_LAST_FRAME_NOT_TO_BE_CONFUSED_TO_WHAT_A_PARTIAL_TICK_IS_IN_ONE_DOT_TWENTY_ONE_WHERE_A_PARTIAL_TICK_IS_THE_FRACTION_OF_A_TICK_SINCE_THE_LAST_TICK_NOT_THE_LAST_FRAME_WOW_THATS_SO_COOL_IM_SO_HAPPY_THIS_WAS_CHANGED_AND_THEY_KEPT_THE_SAME_NAME_SO_IT_TOOK_AGES_TO_DEBUG_AND_FIND_OUT_WHAT_WAS_CAUSING_IT)
     {
         super.renderBackground(guiGraphics);
 
-        partial = partialTick;
-        partialPointerPosition += partialTick;
+        partialTick += FRACTION_OF_A_TICK_THAT_HAPPENED_SINCE_THE_LAST_FRAME_NOT_TO_BE_CONFUSED_TO_WHAT_A_PARTIAL_TICK_IS_IN_ONE_DOT_TWENTY_ONE_WHERE_A_PARTIAL_TICK_IS_THE_FRACTION_OF_A_TICK_SINCE_THE_LAST_TICK_NOT_THE_LAST_FRAME_WOW_THATS_SO_COOL_IM_SO_HAPPY_THIS_WAS_CHANGED_AND_THEY_KEPT_THE_SAME_NAME_SO_IT_TOOK_AGES_TO_DEBUG_AND_FIND_OUT_WHAT_WAS_CAUSING_IT;
 
+        if (this.tickCount != lastTick)
+        {
+            partialTick = FRACTION_OF_A_TICK_THAT_HAPPENED_SINCE_THE_LAST_FRAME_NOT_TO_BE_CONFUSED_TO_WHAT_A_PARTIAL_TICK_IS_IN_ONE_DOT_TWENTY_ONE_WHERE_A_PARTIAL_TICK_IS_THE_FRACTION_OF_A_TICK_SINCE_THE_LAST_TICK_NOT_THE_LAST_FRAME_WOW_THATS_SO_COOL_IM_SO_HAPPY_THIS_WAS_CHANGED_AND_THEY_KEPT_THE_SAME_NAME_SO_IT_TOOK_AGES_TO_DEBUG_AND_FIND_OUT_WHAT_WAS_CAUSING_IT;
+            lastTick = this.tickCount;
+        }
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
         RenderSystem.setShaderTexture(0, TEXTURE);
@@ -438,10 +442,7 @@ public class FishingMinigameScreen extends Screen implements GuiEventListener
             float centerY = height / 2f;
 
             poseStack.translate(centerX, centerY, 0);
-
-            float positionpointerprecisebutfixedbecauseonedottwentybullshitwithpartialtickshappenedwherepartialticksareforsomereasonthepercentageofaticksincelastrenderedframelikeseriouslywhatthefuckisthiswhywouldthatbeagoodframeofreferenceforrenderingWHAT = pointerPos + ((speed * (partialPointerPosition - tickCount)) * currentRotation);
-
-            poseStack.mulPose(new Quaternionf().rotateZ((float) Math.toRadians(positionpointerprecisebutfixedbecauseonedottwentybullshitwithpartialtickshappenedwherepartialticksareforsomereasonthepercentageofaticksincelastrenderedframelikeseriouslywhatthefuckisthiswhywouldthatbeagoodframeofreferenceforrenderingWHAT)));
+            poseStack.mulPose(new Quaternionf().rotateZ((float) Math.toRadians(pointerPos + ((speed * partialTick) * currentRotation))));
             poseStack.translate(-centerX, -centerY, 0);
 
             //16 offset on y for texture centering
@@ -547,7 +548,7 @@ public class FishingMinigameScreen extends Screen implements GuiEventListener
             Vec3 pos = Minecraft.getInstance().player.position();
             ClientLevel level = Minecraft.getInstance().level;
 
-            float pointerPosPrecise = (pointerPos + ((speed * partial) * currentRotation));
+            float pointerPosPrecise = (pointerPos + ((speed * partialTick) * currentRotation));
 
             pointerPosPrecise += hitDelay * speed * currentRotation;
 

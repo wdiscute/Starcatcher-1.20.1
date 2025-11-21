@@ -187,8 +187,6 @@ public class Starcatcher
             List<Component> comp = event.getToolTip();
             ItemStack stack = event.getItemStack();
 
-            SizeAndWeight wdad = DataComponents.getSizeAndWeight(stack);
-
             if (!DataComponents.getSizeAndWeight(stack).equals(SizeAndWeight.DEFAULT))
             {
                 SizeAndWeight sw = DataComponents.getSizeAndWeight(stack);

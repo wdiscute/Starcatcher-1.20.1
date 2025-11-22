@@ -13,7 +13,6 @@ public class SecretNoteScreen extends Screen
 {
     private static final ResourceLocation BACKGROUND = Starcatcher.rl("textures/gui/secret_note.png");
 
-    private final SecretNote.Note note;
     private final String translationKey;
 
     int uiX;
@@ -63,7 +62,6 @@ public class SecretNoteScreen extends Screen
     public SecretNoteScreen(SecretNote.Note note)
     {
         super(Component.empty());
-        this.note = note;
         this.translationKey = "gui.secret_note." + note.getSerializedName() + ".";
     }
 

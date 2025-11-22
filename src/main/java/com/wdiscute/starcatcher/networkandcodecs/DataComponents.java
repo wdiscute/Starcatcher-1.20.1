@@ -42,7 +42,13 @@ public class DataComponents
 
     public static SecretNote.Note getSecretNote(ItemStack is)
     {
-        return SecretNote.Note.getBySerializedName(is.getTag().getString("secret_note"));
+        if(is.hasTag())
+            if(is.getTag().get("secret_note") != null)
+            {
+                return SecretNote.Note.getBySerializedName(is.getTag().getString("secret_note"));
+            }
+
+        return SecretNote.Note.SAMPLE_NOTE;
     }
 
 

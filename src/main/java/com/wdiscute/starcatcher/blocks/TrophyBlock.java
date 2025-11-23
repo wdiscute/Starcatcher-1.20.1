@@ -14,6 +14,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
@@ -24,6 +25,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -36,6 +38,7 @@ import javax.annotation.Nullable;
 public class TrophyBlock extends HorizontalDirectionalBlock implements SimpleWaterloggedBlock, EntityBlock
 {
     private static final Logger LOGGER = LogUtils.getLogger();
+    public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
     public TrophyBlock()
     {
@@ -45,6 +48,25 @@ public class TrophyBlock extends HorizontalDirectionalBlock implements SimpleWat
                 .sound(SoundType.AMETHYST)
         );
     }
+
+    @Override
+    public boolean propagatesSkylightDown(BlockState state, BlockGetter reader, BlockPos pos)
+    {
+        return !(Boolean) state.getValue(WATERLOGGED);
+    }
+
+    @Override
+    public boolean shouldDisplayFluidOverlay(BlockState state, BlockAndTintGetter level, BlockPos pos, FluidState fluidState)
+    {
+        return true;
+    }
+
+    @Override
+    public FluidState getFluidState(BlockState state)
+    {
+        return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(state);
+    }
+
 
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack)
@@ -67,10 +89,14 @@ public class TrophyBlock extends HorizontalDirectionalBlock implements SimpleWat
 
                 CompoundTag tag = itemstack.getOrCreateTag();
 
-                TrophyProperties.CODEC.encode(tbe.trophyProperties, NbtOps.INSTANCE, new CompoundTag())
-                        .resultOrPartial(LOGGER::warn).ifPresent(tag1 -> tag.put("trophy_properties", tag1));
+                if (!tbe.trophyProperties.equals(TrophyProperties.DEFAULT))
+                {
+                    TrophyProperties.CODEC.encode(tbe.trophyProperties, NbtOps.INSTANCE, new CompoundTag())
+                            .resultOrPartial(LOGGER::warn).ifPresent(tag1 -> tag.put("trophy_properties", tag1));
 
-                itemstack.setHoverName(Component.literal(tbe.trophyProperties.customName()));
+                    if (!tbe.trophyProperties.customName().equals(TrophyProperties.DEFAULT.customName()))
+                        itemstack.setHoverName(Component.literal(tbe.trophyProperties.customName()));
+                }
 
                 ItemEntity itementity = new ItemEntity(level, pos.getX(), pos.getY(), pos.getZ(), itemstack);
                 itementity.setDefaultPickUpDelay();
@@ -107,13 +133,12 @@ public class TrophyBlock extends HorizontalDirectionalBlock implements SimpleWat
         }
     }
 
-
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder)
     {
         super.createBlockStateDefinition(builder);
         builder.add(FACING);
-        builder.add(BlockStateProperties.WATERLOGGED);
+        builder.add(WATERLOGGED);
     }
 
     @Override
@@ -121,7 +146,7 @@ public class TrophyBlock extends HorizontalDirectionalBlock implements SimpleWat
     {
         BlockState bs = defaultBlockState();
         bs = bs.setValue(FACING, context.getHorizontalDirection().getOpposite());
-        bs = bs.setValue(BlockStateProperties.WATERLOGGED, context.getLevel().getFluidState(context.getClickedPos()).is(Fluids.WATER));
+        bs = bs.setValue(WATERLOGGED, context.getLevel().getFluidState(context.getClickedPos()).is(Fluids.WATER));
         return bs;
     }
 

@@ -31,6 +31,7 @@ public class DataAttachments implements DataAttachmentCapability, INBTSerializab
 
     public static List<FishCaughtCounter> fishesCaughtClient;
     public static List<TrophyProperties> trophiesCaughtClient;
+    public static List<FishProperties> notificationsClient;
 
     public DataAttachments(Player player)
     {
@@ -134,6 +135,7 @@ public class DataAttachments implements DataAttachmentCapability, INBTSerializab
     @Override
     public List<FishProperties> fishNotifications()
     {
+        if(player.level().isClientSide) return notificationsClient;
         return notifications;
     }
 
@@ -153,8 +155,7 @@ public class DataAttachments implements DataAttachmentCapability, INBTSerializab
             notifications.add(fp);
         }
 
-        DataAttachments.get(player).setFishNotifications(notifications);
-
+        notificationsClient = notifications;
     }
 
     @Override

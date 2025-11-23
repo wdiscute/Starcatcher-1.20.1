@@ -30,6 +30,7 @@ public class DataAttachments implements DataAttachmentCapability, INBTSerializab
     private final Player player;
 
     public static List<FishCaughtCounter> fishesCaughtClient;
+    public static List<TrophyProperties> trophiesCaughtClient;
 
     public DataAttachments(Player player)
     {
@@ -111,12 +112,14 @@ public class DataAttachments implements DataAttachmentCapability, INBTSerializab
     @Override
     public List<TrophyProperties> trophiesCaught()
     {
+        if(player.level().isClientSide) return trophiesCaughtClient;
         return this.trophiesCaught;
     }
 
     @Override
     public void setTrophiesCaught(List<TrophyProperties> list)
     {
+        if(player.level().isClientSide) trophiesCaughtClient = list;
         this.trophiesCaught = list;
 
         if (this.player instanceof ServerPlayer sp)

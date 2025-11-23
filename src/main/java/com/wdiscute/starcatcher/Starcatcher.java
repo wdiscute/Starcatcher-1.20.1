@@ -31,6 +31,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.EntityRenderersEvent;
@@ -158,6 +159,21 @@ public class Starcatcher
             };
 
             event.addCapability(Starcatcher.rl("fish"), provider);
+        }
+
+        @SubscribeEvent
+        public static void playerOnDeath(PlayerEvent.Clone event)
+        {
+            if(event.isWasDeath())
+            {
+                event.getOriginal().reviveCaps();
+                event.getOriginal().getCapability(DataAttachments.PLAYER_DATA).ifPresent(oldData ->
+                {
+                    DataAttachments.get(event.getEntity()).setFishNotifications(oldData.fishNotifications());
+                    DataAttachments.get(event.getEntity()).setTrophiesCaught(oldData.trophiesCaught());
+                    DataAttachments.get(event.getEntity()).setFishesCaught(oldData.fishesCaught());
+                });
+            }
         }
 
         @SubscribeEvent

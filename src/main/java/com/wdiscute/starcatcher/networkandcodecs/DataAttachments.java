@@ -29,6 +29,8 @@ public class DataAttachments implements DataAttachmentCapability, INBTSerializab
 
     private final Player player;
 
+    public static List<FishCaughtCounter> fishesCaughtClient;
+
     public DataAttachments(Player player)
     {
         this.player = player;
@@ -62,6 +64,7 @@ public class DataAttachments implements DataAttachmentCapability, INBTSerializab
     @Override
     public List<FishCaughtCounter> fishesCaught()
     {
+        if(player.level().isClientSide) return fishesCaughtClient;
         return fishesCaught;
     }
 
@@ -87,7 +90,7 @@ public class DataAttachments implements DataAttachmentCapability, INBTSerializab
                     fishCaughtNetwork.golden()));
         }
 
-        DataAttachments.get(player).setFishesCaught(list);
+        fishesCaughtClient = list;
     }
 
     @Override

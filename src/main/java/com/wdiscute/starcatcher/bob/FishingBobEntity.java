@@ -171,7 +171,7 @@ public class FishingBobEntity extends Projectile
                 ItemStack is = new ItemStack(tp.fp().fish());
                 DataComponents.setTrophyProperties(is, tp);
                 //is.set(ModDataComponents.TROPHY, tp);
-                if (!tp.customName().equals(TrophyProperties.DEFAULT.customName()))
+                if (!tp.customName().equals(TrophyProperties.DEFAULT.customName()) && tp.trophyType().equals(TrophyProperties.TrophyType.TROPHY))
                 {
                     is.setHoverName(Component.literal(tp.customName()));
                 }
